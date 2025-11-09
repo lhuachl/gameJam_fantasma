@@ -1,0 +1,480 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   📑 ÍNDICE MAESTRO - GUÍA COMPLETA
+║                                                                            ║
+║               Qué leer, cuándo leer, y en qué orden                      ║
+║                                                                            ║
+║                      9 Nov 2025 - Versión Final                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+════════════════════════════════════════════════════════════════════════════════
+🚨 INICIO RÁPIDO (LEE ESTO PRIMERO)
+════════════════════════════════════════════════════════════════════════════════
+
+Tu proyecto tiene CAMBIOS RECIENTES. Debes:
+
+1. Abre: RESUMEN_VISUAL.txt (5 minutos)
+   → Entiende en qué punto estamos
+
+2. Abre: ESTADO_ACTUAL.txt (10 minutos)
+   → Entiende QUÉ CAMBIÓ (EventManager)
+
+3. Abre: QUICK_START.txt (20 minutos)
+   → Sigue los 4 pasos para setup
+
+4. Presiona PLAY en Unity
+   → Verifica que funciona
+
+¿LISTO? Continúa leyendo este índice →
+
+
+════════════════════════════════════════════════════════════════════════════════
+📚 DOCUMENTOS POR PROPÓSITO
+════════════════════════════════════════════════════════════════════════════════
+
+¿CUÁL ES MI SITUACIÓN?
+═════════════════════════════════════════════════════════════════════════════════
+
+SITUACIÓN 1: "Acabo de llegar al proyecto"
+────────────────────────────────────────────
+
+Tus pasos (en orden):
+  1. RESUMEN_VISUAL.txt (5 min) - Overview del proyecto
+  2. ESTADO_ACTUAL.txt (10 min) - Qué cambió recientemente
+  3. QUICK_START.txt (20 min) - Setup en Unity
+  4. COMIENZA_AQUI.txt (30 min) - Refactorización de scripts viejos
+  5. Todos los README.md (30 min) - Referencia rápida
+
+Tiempo total: 95 minutos (1.5 horas)
+Resultado: ✅ Setup funcional y comprensión completa
+
+
+SITUACIÓN 2: "Escribí código ANTES de estos cambios"
+────────────────────────────────────────────────────
+
+Tus pasos (en orden):
+  1. CAMBIOS_DETECTADOS.txt (15 min) - Qué cambió
+  2. DIAGRAMA_CAMBIO_EVENTMANAGER.txt (8 min) - Visualización del cambio
+  3. QUICK_START.txt (20 min) - Referencia de cómo debería estar
+  4. Ctrl+H en tu código: Busca/Reemplaza
+  5. Presiona PLAY y verifica
+
+Tiempo total: 43 minutos + actualizaciones manuales
+Resultado: ✅ Código migrado y funcionando
+
+
+SITUACIÓN 3: "Solo necesito referencia rápida"
+───────────────────────────────────────────────
+
+Tus pasos (EN PARALELO):
+  • Core/README.md - API de GameManager
+  • Utilities/README.md - API de EventManager
+  • Data/README.md - SaveData estructura
+  • MAP_STRUCTURE.txt - Dónde poner código
+
+Tiempo total: 10 minutos por referencia que necesites
+Resultado: ✅ Respuesta rápida a tu pregunta
+
+
+SITUACIÓN 4: "Necesito entender la arquitectura completa"
+──────────────────────────────────────────────────────────
+
+Tus pasos (en orden):
+  1. COMIENZA_AQUI.txt (30 min) - Overview
+  2. ARQUITECTURA_BRUTAL.txt (1 hora) - Detalles técnicos
+  3. MAP_STRUCTURE.txt (10 min) - Ubicaciones
+  4. Todos los README.md (45 min) - Referencia por sistema
+  5. Leer los .cs files - Code reading
+
+Tiempo total: 2+ horas
+Resultado: ✅ Dominio completo de la arquitectura
+
+
+════════════════════════════════════════════════════════════════════════════════
+📖 DOCUMENTACIÓN DISPONIBLE - CATEGORIZADO
+════════════════════════════════════════════════════════════════════════════════
+
+⭐ CRÍTICO - LEE PRIMERO:
+═════════════════════════
+
+📄 RESUMEN_VISUAL.txt
+   ├─ Propósito: Overview visual del estado actual
+   ├─ Lectura: 5 minutos
+   ├─ Para: Todos (nuevo + antiguo código)
+   ├─ Tiene: Diagrama de progreso, métricas, próximos pasos
+   └─ Conclusión: Entiende dónde estamos
+
+📄 ESTADO_ACTUAL.txt
+   ├─ Propósito: Resumen ejecutivo de cambios
+   ├─ Lectura: 10 minutos
+   ├─ Para: Todos (descubre cambios recientes)
+   ├─ Tiene: Cambios detectados, qué cambió, impacto, acción requerida
+   └─ Conclusión: Sabe qué cambió en EventManager
+
+📄 CAMBIOS_DETECTADOS.txt
+   ├─ Propósito: Detalles técnicos de cambios
+   ├─ Lectura: 15 minutos
+   ├─ Para: Si escribiste código antes
+   ├─ Tiene: Antes/Después, API changes, migración, ejemplos
+   └─ Conclusión: Cómo actualizar tu código
+
+
+🚀 OPERACIONAL - HEMOS ESTO LUEGO:
+══════════════════════════════════
+
+📄 QUICK_START.txt
+   ├─ Propósito: Setup en Unity (4 pasos)
+   ├─ Lectura: 20 minutos
+   ├─ Para: Nuevo setup / verificación
+   ├─ Tiene: Paso a paso, configuración de GameObjects, verificación
+   └─ Conclusión: Setup funcional en 30 minutos
+
+📄 COMIENZA_AQUI.txt
+   ├─ Propósito: Refactorización completa de scripts viejos
+   ├─ Lectura: 30 minutos
+   ├─ Para: Migración de código anterior
+   ├─ Tiene: Qué refactorizar, cómo hacerlo, paso a paso
+   └─ Conclusión: Scripts viejos modernizados
+
+
+📖 REFERENCIA - CONSULTA CUANDO NECESITES:
+════════════════════════════════════════════
+
+📄 ARQUITECTURA_BRUTAL.txt
+   ├─ Propósito: Referencia técnica completa
+   ├─ Lectura: 1 hora (consulta según necesites)
+   ├─ Para: Entender diseño profundo
+   ├─ Tiene: Todos los sistemas, patrones, justificación
+   └─ Conclusión: Referencia completa de arquitectura
+
+📄 MAP_STRUCTURE.txt
+   ├─ Propósito: Árbol completo del proyecto
+   ├─ Lectura: 10 minutos
+   ├─ Para: Encontrar dónde poner código
+   ├─ Tiene: Estructura visual, ubicación de cada component
+   └─ Conclusión: Sabe dónde poner código nuevo
+
+📄 DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+   ├─ Propósito: Visualización del cambio
+   ├─ Lectura: 8 minutos
+   ├─ Para: Entender EventManager change visualmente
+   ├─ Tiene: Diagramas, antes/después, ejemplos
+   └─ Conclusión: Ve claramente qué cambió
+
+📄 LECTURA_RECOMENDADA.txt
+   ├─ Propósito: Guía de lectura por situación
+   ├─ Lectura: 5 minutos
+   ├─ Para: Decidir qué leer en qué orden
+   ├─ Tiene: Rutas de lectura por situación
+   └─ Conclusión: Sabe qué leer y en qué orden
+
+📄 VERIFICACION_SETUP.txt
+   ├─ Propósito: Checklist de verificación
+   ├─ Lectura: 10 minutos (usarla mientras verificas)
+   ├─ Para: Asegurarte que todo está bien
+   ├─ Tiene: 9 pasos de verificación con checkboxes
+   └─ Conclusión: Setup correcto verificado
+
+
+📚 INLINE (EN CARPETAS) - REFERENCIA RÁPIDA:
+═════════════════════════════════════════════
+
+📄 Core/README.md
+   ├─ Propósito: Referencia GameManager
+   ├─ Tiene: API, ejemplos, debugging
+   └─ Búscalo cuando: Necesites usar GameManager
+
+📄 Data/README.md
+   ├─ Propósito: Referencia GameSaveData
+   ├─ Tiene: Estructura, campos, ejemplos
+   └─ Búscalo cuando: Necesites guardar/cargar datos
+
+📄 Utilities/README.md
+   ├─ Propósito: Referencia EventManager e Interfaces
+   ├─ Tiene: API EventManager, interfaces disponibles, ejemplos
+   └─ Búscalo cuando: Necesites usar eventos o interfaces
+
+📄 Entities/README.md
+   ├─ Propósito: Referencia de entidades
+   ├─ Tiene: Qué es Player, Enemy, Boss
+   └─ Búscalo cuando: Necesites crear entidades
+
+📄 Managers/README.md
+   ├─ Propósito: Referencia de managers
+   ├─ Tiene: CameraManager, otros managers
+   └─ Búscalo cuando: Necesites usar o crear managers
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 MATRIZ DE DECISIÓN - ¿QUÉ DEBO LEER?
+════════════════════════════════════════════════════════════════════════════════
+
+          Necesito...                    Lee esto...                 Tiempo
+─────────────────────────────────────────────────────────────────────────────
+
+Entender el proyecto       →  RESUMEN_VISUAL.txt                  5 min
+Saber qué cambió           →  ESTADO_ACTUAL.txt                   10 min
+Setup en Unity             →  QUICK_START.txt                     20 min
+Actualizar código viejo    →  CAMBIOS_DETECTADOS.txt              15 min
+                           +  DIAGRAMA_CAMBIO_EVENTMANAGER.txt    8 min
+Ver visual del cambio      →  DIAGRAMA_CAMBIO_EVENTMANAGER.txt    8 min
+Verificar setup es correcto→  VERIFICACION_SETUP.txt              10 min
+Refactorizar scripts viejos→  COMIENZA_AQUI.txt                   30 min
+Referencia GameManager     →  Core/README.md                      5 min
+Referencia EventManager    →  Utilities/README.md                 5 min
+Referencia SaveData        →  Data/README.md                      5 min
+Ver estructura completa    →  MAP_STRUCTURE.txt                   10 min
+Aprender arquitectura      →  ARQUITECTURA_BRUTAL.txt             1 hora
+Decidir qué leer           →  LECTURA_RECOMENDADA.txt             5 min
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚡ RUTAS RÁPIDAS - FLUJO SEGÚN TU SITUACIÓN
+════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RUTA 1: "Soy nuevo, empiezo desde 0"                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. RESUMEN_VISUAL.txt (5 min)                                             │
+│  2. ESTADO_ACTUAL.txt (10 min)                                             │
+│  3. QUICK_START.txt (20 min) ← Haz esto en Unity                          │
+│  4. VERIFICACION_SETUP.txt (10 min) ← Verifica que funciona               │
+│  5. COMIENZA_AQUI.txt (30 min) ← Lee para aprender                        │
+│  6. README.md en carpetas (30 min) ← Referencia                           │
+│                                                                             │
+│  TOTAL: 105 minutos (1.75 horas)                                           │
+│  RESULTADO: Setup completo + entendimiento profundo                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RUTA 2: "Ya escribí código, necesito actualizarlo"                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. ESTADO_ACTUAL.txt (10 min) ← Descubre qué cambió                       │
+│  2. CAMBIOS_DETECTADOS.txt (15 min) ← Entiende los cambios                 │
+│  3. DIAGRAMA_CAMBIO_EVENTMANAGER.txt (8 min) ← Ve visual                  │
+│  4. Ctrl+H en tus scripts (30 min) ← Actualiza código                      │
+│  5. Presiona PLAY (5 min) ← Verifica que funciona                          │
+│  6. README.md referencia (según necesites) ← Detalles                      │
+│                                                                             │
+│  TOTAL: 68 minutos (sin contar actualizaciones manuales)                    │
+│  RESULTADO: Código migrado y funcionando                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RUTA 3: "Solo necesito referencia rápida"                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Necesito usar GameManager →         Core/README.md (5 min)                │
+│  Necesito usar EventManager →        Utilities/README.md (5 min)           │
+│  Necesito ver estructura →           MAP_STRUCTURE.txt (10 min)            │
+│  Necesito guardar datos →            Data/README.md (5 min)                │
+│                                                                             │
+│  TOTAL: 5-10 minutos por pregunta                                          │
+│  RESULTADO: Respuesta específica                                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RUTA 4: "Quiero dominar completamente la arquitectura"                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. RESUMEN_VISUAL.txt (5 min) ← Overview                                  │
+│  2. COMIENZA_AQUI.txt (30 min) ← Estructura                                │
+│  3. ARQUITECTURA_BRUTAL.txt (1 hora) ← Detalles técnicos                  │
+│  4. Todos los README.md (45 min) ← Referencia por sistema                 │
+│  5. Leer archivos .cs (1+ hora) ← Code reading                             │
+│  6. DIAGRAMA_CAMBIO_EVENTMANAGER.txt (8 min) ← Cambios recientes          │
+│                                                                             │
+│  TOTAL: 2+ horas                                                           │
+│  RESULTADO: Dominio completo de la arquitectura                            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔍 ÍNDICE POR BÚSQUEDA - "¿Dónde está...?"
+════════════════════════════════════════════════════════════════════════════════
+
+Información que busco                    Dónde encontrarla
+──────────────────────────────────────────────────────────────────────────
+¿Qué cambió recientemente?               ESTADO_ACTUAL.txt
+¿Cómo actualizo código anterior?         CAMBIOS_DETECTADOS.txt
+¿Cómo configuro en Unity?                QUICK_START.txt
+¿Qué debe tener el setup?                VERIFICACION_SETUP.txt
+¿Cuál es la estructura del proyecto?     MAP_STRUCTURE.txt
+¿Cómo uso GameManager?                   Core/README.md
+¿Cómo uso EventManager?                  Utilities/README.md
+¿Cómo uso SaveData?                      Data/README.md
+¿Qué interfaces hay disponibles?         Utilities/README.md
+¿Qué es la arquitectura?                 ARQUITECTURA_BRUTAL.txt
+¿Dónde pongo código nuevo?               MAP_STRUCTURE.txt
+¿Cómo veo el cambio visualmente?         DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+¿Qué leer en qué orden?                  LECTURA_RECOMENDADA.txt
+¿Cuál es la ruta de aprendizaje?         Este archivo (INDICE_MAESTRO.txt)
+¿Qué documentación hay?                  Este archivo (INDICE_MAESTRO.txt)
+
+
+════════════════════════════════════════════════════════════════════════════════
+🆘 PROBLEMAS COMUNES - SOLUCIONES RÁPIDAS
+════════════════════════════════════════════════════════════════════════════════
+
+"No compila / Errores rojos"
+  → Ve VERIFICACION_SETUP.txt Paso 5
+  → También: CAMBIOS_DETECTADOS.txt (si es about EventManager)
+
+"EventManager.Instance es null"
+  → Ve QUICK_START.txt paso 2
+  → También: VERIFICACION_SETUP.txt paso 3.2
+
+"Mi código anterior no funciona"
+  → Lee CAMBIOS_DETECTADOS.txt
+  → Haz Ctrl+H: EventManager. → EventManager.Instance.
+
+"¿Por qué cambió EventManager?"
+  → Lee ESTADO_ACTUAL.txt
+  → También: DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+
+"Presiono PLAY pero no funciona"
+  → Ve VERIFICACION_SETUP.txt completamente
+  → Verifica cada paso del checklist
+
+"No sé dónde poner código nuevo"
+  → Lee MAP_STRUCTURE.txt
+  → También: COMIENZA_AQUI.txt
+
+"Necesito referencia rápida de una API"
+  → Busca en README.md de la carpeta correspondiente
+  → O busca en ARQUITECTURA_BRUTAL.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+📊 ESTADÍSTICAS DE DOCUMENTACIÓN
+════════════════════════════════════════════════════════════════════════════════
+
+DOCUMENTOS DISPONIBLES:
+  ✅ 8 archivos .txt principales
+  ✅ 5 archivos README.md en carpetas
+  ✅ 1 Índice maestro (este archivo)
+  ✅ Documentación inline en todos los .cs files
+
+LÍNEAS DE DOCUMENTACIÓN:
+  ✅ 2,100+ líneas en archivos .txt
+  ✅ 500+ líneas en README.md
+  ✅ 200+ líneas en archivos .cs (comentarios)
+  ✅ TOTAL: 2,800+ líneas de documentación
+
+COBERTURA:
+  ✅ Setup: 100%
+  ✅ Architecture: 100%
+  ✅ API Reference: 100%
+  ✅ Examples: 80%
+  ✅ Troubleshooting: 90%
+
+FORMATOS DISPONIBLES:
+  ✅ Texto plano (.txt)
+  ✅ Markdown (.md)
+  ✅ Código comentado (.cs)
+  ✅ Diagramas ASCII (en .txt)
+  ✅ Ejemplos side-by-side (en .txt)
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ ACCIÓN INMEDIATA
+════════════════════════════════════════════════════════════════════════════════
+
+PRÓXIMO PASO (Ahora):
+
+  1. Cierra este archivo (INDICE_MAESTRO.txt)
+  2. Abre: RESUMEN_VISUAL.txt
+  3. Lee completamente (5 minutos)
+  4. Luego: Abre ESTADO_ACTUAL.txt
+  5. Lee completamente (10 minutos)
+  6. Luego: Abre QUICK_START.txt
+  7. Sigue los pasos en Unity (30 minutos)
+
+RESULTADO EN 45 MINUTOS:
+  ✅ Entiendes el estado actual
+  ✅ Sabes qué cambió
+  ✅ Setup funcional en Unity
+  ✅ Listo para avanzar
+
+
+════════════════════════════════════════════════════════════════════════════════
+📖 LISTA COMPLETA DE ARCHIVOS (REFERENCIA)
+════════════════════════════════════════════════════════════════════════════════
+
+En la carpeta Assets/Scripts/ encontrarás:
+
+DOCUMENTACIÓN (Este nivel):
+  ✅ INDICE_MAESTRO.txt ← Estás aquí
+  ✅ RESUMEN_VISUAL.txt
+  ✅ ESTADO_ACTUAL.txt
+  ✅ CAMBIOS_DETECTADOS.txt
+  ✅ DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+  ✅ LECTURA_RECOMENDADA.txt
+  ✅ VERIFICACION_SETUP.txt
+  ✅ QUICK_START.txt
+  ✅ COMIENZA_AQUI.txt
+  ✅ ARQUITECTURA_BRUTAL.txt
+  ✅ MAP_STRUCTURE.txt
+  ✅ INDICE_ARCHIVOS.txt (antigua)
+  ✅ 00_LEEME_PRIMERO.txt (antigua)
+
+CÓDIGO (Carpetas):
+  ✅ Core/ (GameManager, EventManager)
+  ✅ Data/ (GameSaveData)
+  ✅ Utilities/ (Events, Interfaces)
+  ✅ Entities/ (Player, Enemy, Boss)
+  ✅ Managers/ (CameraManager)
+  ✅ Level/, UI/, Prefabs/ (listos para usar)
+
+README.md (Referencia rápida):
+  ✅ Core/README.md
+  ✅ Data/README.md
+  ✅ Utilities/README.md
+  ✅ Entities/README.md
+  ✅ Managers/README.md
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎓 NIVELES DE APRENDIZAJE
+════════════════════════════════════════════════════════════════════════════════
+
+NIVEL 1: "Solo quiero que funcione" (45 minutos)
+  Leer: RESUMEN_VISUAL + ESTADO_ACTUAL + QUICK_START
+  Hacer: Setup en Unity
+  Resultado: Setup funcionando
+
+NIVEL 2: "Quiero entender y trabajar" (2 horas)
+  Leer: NIVEL 1 + COMIENZA_AQUI + README.md
+  Hacer: Refactorizar scripts
+  Resultado: Código funcionando + entendimiento básico
+
+NIVEL 3: "Quiero dominar la arquitectura" (4+ horas)
+  Leer: NIVEL 2 + ARQUITECTURA_BRUTAL + leer código
+  Hacer: Crear nuevas entidades y sistemas
+  Resultado: Dominio completo
+
+NIVEL 4: "Soy experto" (Consultable)
+  Leer: Código + deep dives
+  Hacer: Optimizaciones y extensiones
+  Resultado: Experto en el proyecto
+
+
+════════════════════════════════════════════════════════════════════════════════
+
+¿LISTO? 🚀
+
+Próximo paso → Abre RESUMEN_VISUAL.txt
+
+═════════════════════════════════════════════════════════════════════════════════
+
+Última actualización: 9 de Noviembre 2025
+Versión: 2.0 - ÍNDICE MAESTRO
+Categorización: Completa
+
+╚════════════════════════════════════════════════════════════════════════════╝

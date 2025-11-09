@@ -1,0 +1,262 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                  📚 LECTURA SECUENCIAL ACTUALIZADA                        ║
+║                                                                            ║
+║                        Versión 2 - 9 Nov 2025                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+🎯 LECTURA RECOMENDADA (EN ESTE ORDEN)
+════════════════════════════════════════════════════════════════════════════
+
+1️⃣ ESTADO_ACTUAL.txt (⭐ NUEVO - LEE PRIMERO)
+   ⏱️ 10 minutos
+   📖 Resumen de cambios recientes
+   🔄 Qué cambió: EventManager es ahora MonoBehaviour
+   ✅ LEER PRIMERO si algo no funciona
+
+2️⃣ CAMBIOS_DETECTADOS.txt (⭐ NUEVO - IMPORTANTE)
+   ⏱️ 15 minutos
+   📖 Detalles técnicos de cambios
+   🔄 Cómo migrar código anterior
+   ✅ LEER SEGUNDO si escribiste código
+
+3️⃣ QUICK_START.txt (ACTUALIZADO)
+   ⏱️ 20 minutos
+   📖 Setup en Unity (actualizado)
+   🔄 4 pasos para que funcione
+   ✅ SEGUIR ESTOS PASOS
+
+4️⃣ COMIENZA_AQUI.txt (ACTUALIZADO)
+   ⏱️ 30 minutos
+   📖 Refactorización de scripts viejos
+   🔄 Guía detallada paso a paso
+   ✅ HACER DESPUÉS del QUICK_START
+
+5️⃣ ARQUITECTURA_BRUTAL.txt (REFERENCIA)
+   ⏱️ Consultar según necesites
+   📖 Referencia técnica completa
+   🔄 Explicación profunda de cada sistema
+   ✅ LEER cuando necesites detalles
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚡ ATAJO RÁPIDO (Si tienes poco tiempo)
+════════════════════════════════════════════════════════════════════════════════
+
+Opción 1: "Necesito saber qué cambió"
+  1. ESTADO_ACTUAL.txt (10 min)
+  2. CAMBIOS_DETECTADOS.txt (15 min)
+  ✅ Total: 25 minutos
+
+Opción 2: "Quiero seguir del inicio"
+  1. ESTADO_ACTUAL.txt (10 min)
+  2. QUICK_START.txt (20 min)
+  3. Hacer setup en Unity (30 min)
+  ✅ Total: 1 hora
+
+Opción 3: "Ya avancé, ¿qué actualizo?"
+  1. CAMBIOS_DETECTADOS.txt (15 min)
+  2. Reemplazar EventManager. → EventManager.Instance. (30 min)
+  3. Verificar que compila (10 min)
+  ✅ Total: 55 minutos
+
+
+════════════════════════════════════════════════════════════════════════════════
+📋 MAPEO COMPLETO DE ARCHIVOS
+════════════════════════════════════════════════════════════════════════════════
+
+⭐ CAMBIOS RECIENTES (LEE ESTOS PRIMERO):
+  ├─ ESTADO_ACTUAL.txt (resumen de cambios)
+  ├─ CAMBIOS_DETECTADOS.txt (detalles técnicos)
+  └─ QUICK_START.txt (setup actualizado)
+
+📚 DOCUMENTACIÓN PRINCIPAL:
+  ├─ COMIENZA_AQUI.txt (guía completa)
+  ├─ ARQUITECTURA_BRUTAL.txt (referencia técnica)
+  ├─ MAP_STRUCTURE.txt (árbol del proyecto)
+  └─ INDICE_ARCHIVOS.txt (navegación vieja)
+
+📖 README.md EN CARPETAS (NUEVO):
+  ├─ Core/README.md (GameManager)
+  ├─ Data/README.md (GameSaveData)
+  ├─ Utilities/README.md (Events & Interfaces)
+  ├─ Entities/README.md (Entity structure)
+  └─ Managers/README.md (Managers)
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ VERIFICACIÓN: "¿Debo actualizar mi código?"
+════════════════════════════════════════════════════════════════════════════════
+
+¿Escribiste código antes de hoy?
+
+Busca en tu código:
+
+  ❌ EventManager.Subscribe<T>(handler);
+     → SÍ, necesitas actualizar
+
+  ❌ EventManager.Broadcast(event);
+     → SÍ, necesitas actualizar
+
+  ✅ EventManager.Instance.Subscribe<T>(handler);
+     → NO, ya está correcto
+
+  ✅ EventManager.Instance.Broadcast(event);
+     → NO, ya está correcto
+
+
+SI NECESITAS ACTUALIZAR:
+  1. Lee: CAMBIOS_DETECTADOS.txt sección "Migración"
+  2. Busca: Ctrl+H (Find & Replace)
+  3. Reemplaza: EventManager. → EventManager.Instance.
+  4. Verifica: Compila sin errores
+  5. Prueba: Presiona PLAY
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔍 BUSCA RÁPIDA: ¿Dónde está...?
+════════════════════════════════════════════════════════════════════════════════
+
+INFORMACIÓN QUE BUSCO              DÓNDE ENCONTRARLA
+─────────────────────────────────────────────────────────
+¿Qué cambió?                       ESTADO_ACTUAL.txt
+¿Cómo actualizo mi código?         CAMBIOS_DETECTADOS.txt
+¿Cómo configuro en Unity?          QUICK_START.txt
+¿Cómo uso GameManager?             Core/README.md
+¿Cómo uso EventManager?            Utilities/README.md
+¿Qué interfaces hay?               Utilities/README.md
+¿Cómo heredo BaseEnemy?            MAP_STRUCTURE.txt
+¿Cuál es la arquitectura completa? ARQUITECTURA_BRUTAL.txt
+¿Qué archivos debo crear?          COMIENZA_AQUI.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 FLUJO RECOMENDADO
+════════════════════════════════════════════════════════════════════════════════
+
+SITUACIÓN 1: "Acabo de llegar al proyecto"
+  1. ESTADO_ACTUAL.txt → Entiende qué está pasando
+  2. QUICK_START.txt → Setup básico
+  3. COMIENZA_AQUI.txt → Refactorización
+  ✅ Listo en 2-3 horas
+
+SITUACIÓN 2: "Algo no funciona"
+  1. Console → Busca errores
+  2. CAMBIOS_DETECTADOS.txt → Verifica cambios recientes
+  3. ARQUITECTURA_BRUTAL.txt → Busca solución
+  ✅ Resolvible en 30 minutos
+
+SITUACIÓN 3: "Necesito agregar un feature nuevo"
+  1. MAP_STRUCTURE.txt → Ve dónde ponerlo
+  2. Core/README.md + Data/README.md → Cómo acceder al estado
+  3. Utilities/README.md → Cómo comunicar con eventos
+  ✅ Implementable en 1-2 horas
+
+SITUACIÓN 4: "Necesito entender todo profundamente"
+  1. COMIENZA_AQUI.txt → Overview
+  2. ARQUITECTURA_BRUTAL.txt → Detalles
+  3. Todos los README.md → Referencia
+  ✅ Comprensión completa en 3-4 horas
+
+
+════════════════════════════════════════════════════════════════════════════════
+📝 CHECKLIST DE LECTURA
+════════════════════════════════════════════════════════════════════════════════
+
+OBLIGATORIA (para empezar):
+  [ ] ESTADO_ACTUAL.txt
+  [ ] QUICK_START.txt
+  [ ] He configurado en Unity y funciona
+
+RECOMENDADA (para trabajar):
+  [ ] CAMBIOS_DETECTADOS.txt (si empecé antes)
+  [ ] COMIENZA_AQUI.txt (para refactorizar)
+  [ ] Core/README.md (referencia rápida)
+  [ ] Utilities/README.md (referencia rápida)
+
+OPCIONAL (para profundizar):
+  [ ] ARQUITECTURA_BRUTAL.txt
+  [ ] MAP_STRUCTURE.txt
+  [ ] Todos los README.md
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 DECISIÓN: ¿Por dónde empiezo?
+════════════════════════════════════════════════════════════════════════════════
+
+¿ERES NUEVO EN EL PROYECTO?
+  → Lee: ESTADO_ACTUAL.txt (10 min)
+  → Luego: QUICK_START.txt (20 min)
+  → Haz: Setup en Unity (30 min)
+
+¿ESCRIBISTE CÓDIGO ANTES?
+  → Lee: CAMBIOS_DETECTADOS.txt (15 min)
+  → Actualiza: EventManager. → EventManager.Instance. (30 min)
+  → Verifica: Presiona PLAY
+
+¿NECESITAS REFERENCIA RÁPIDA?
+  → Ve a: Core/README.md (GameManager)
+  → O: Utilities/README.md (EventManager)
+  → O: MAP_STRUCTURE.txt (estructura)
+
+¿NECESITAS ENTENDER TODO?
+  → Lee: COMIENZA_AQUI.txt (30 min)
+  → Luego: ARQUITECTURA_BRUTAL.txt (1 hora)
+  → Finalmente: Todos los README.md
+
+
+════════════════════════════════════════════════════════════════════════════════
+🆘 SI ALGO NO FUNCIONA
+════════════════════════════════════════════════════════════════════════════════
+
+Error compilación:
+  1. Console → Busca el error exacto
+  2. CAMBIOS_DETECTADOS.txt → Busca si es por EventManager
+  3. Verifica que EventManager.cs está en Core/
+
+Error en runtime:
+  1. Console → Busca el error
+  2. Verifica que EventManager GameObject existe en escena
+  3. Verifica que GameManager GameObject existe en escena
+
+EventManager.Broadcast no funciona:
+  1. Asegúrate de usar: EventManager.Instance.Broadcast(...)
+  2. No: EventManager.Broadcast(...) (eso es el viejo patrón)
+  3. Ve: CAMBIOS_DETECTADOS.txt para migración
+
+Datos no se guardan:
+  1. Ve: Core/README.md para GameManager
+  2. Ve: ARQUITECTURA_BRUTAL.txt para SaveData
+
+
+════════════════════════════════════════════════════════════════════════════════
+✨ RESUMEN FINAL
+════════════════════════════════════════════════════════════════════════════════
+
+CAMBIO PRINCIPAL:
+  EventManager es ahora MonoBehaviour (antes era static)
+
+DOCUMENTACIÓN ACTUALIZADA:
+  ✅ QUICK_START.txt
+  ✅ COMIENZA_AQUI.txt
+  ✅ CAMBIOS_DETECTADOS.txt (NUEVO)
+  ✅ ESTADO_ACTUAL.txt (NUEVO)
+
+COMO EMPEZAR:
+  1. Lee ESTADO_ACTUAL.txt (10 min)
+  2. Lee QUICK_START.txt (20 min)
+  3. Haz setup en Unity (30 min)
+  4. Verifica que funciona
+  ✅ Total: 1 hora
+
+¿LISTO?
+  → Abre ESTADO_ACTUAL.txt
+  → Lee y entiende los cambios
+  → Luego: QUICK_START.txt
+  → ¡Adelante!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Última actualización: 9 de Noviembre 2025
+
+╚════════════════════════════════════════════════════════════════════════════╝

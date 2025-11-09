@@ -1,0 +1,504 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║              📸 PASO A PASO VISUAL - SETUP EN UNITY
+║                                                                            ║
+║              Instrucciones gráficas para configurar todo                  ║
+║                                                                            ║
+║                       9 Nov 2025 - Visual Guide                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎮 PREREQUISITOS
+════════════════════════════════════════════════════════════════════════════════
+
+Antes de empezar, verifica que tienes:
+
+✅ Unity 2020+ (o tu versión actual)
+✅ New Input System instalado
+✅ Assets/Scripts/ folder existe
+✅ Todos los archivos .cs en sus carpetas (Core/, Data/, etc)
+✅ Scene abierta en Unity
+
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 PASO 1: CREAR GAMEMANAGER
+════════════════════════════════════════════════════════════════════════════════
+
+VISUAL:
+  ┌─ Hierarchy (arriba a la izquierda)
+  │
+  │  ┌─ Scene
+  │  │  ├─ Main Camera
+  │  │  ├─ Player         ← Existente
+  │  │  ├─ Enemy          ← Existente
+  │  │  └─ 📍 NEW: GameManager  ← CREA AQUÍ
+  │
+
+PASOS:
+
+1. En Hierarchy (arriba izquierda), haz clic derecho
+   └─ Create Empty
+      └─ Renombra a: "GameManager"
+
+2. Con GameManager seleccionado, ve a Inspector (derecha)
+   └─ Add Component
+      └─ Script → Arrastra Core/GameManager.cs
+
+3. Verifica Inspector:
+   └─ ✅ GameManager script está asignado
+   └─ ✅ NO hay errores rojos
+
+
+VERIFICACIÓN VISUAL:
+  ┌─ Inspector muestra
+  │
+  │  GameManager ✓
+  │  ├─ Transform
+  │  │  ├─ Position: (0, 0, 0)
+  │  │  └─ Rotation: (0, 0, 0)
+  │  ├─ GameManager (Script) ✓
+  │  │  └─ No hay errores rojos
+  │
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚡ PASO 2: CREAR EVENTMANAGER (⭐ CRÍTICO - NUEVO)
+════════════════════════════════════════════════════════════════════════════════
+
+VISUAL:
+  ┌─ Hierarchy
+  │
+  │  ┌─ Scene
+  │  │  ├─ Main Camera
+  │  │  ├─ GameManager        ← De paso 1
+  │  │  ├─ Player
+  │  │  ├─ Enemy
+  │  │  └─ 📍 NEW: EventManager  ← CREA AQUÍ (NUEVO PASO)
+  │
+
+PASOS:
+
+1. En Hierarchy, haz clic derecho
+   └─ Create Empty
+      └─ Renombra a: "EventManager"
+
+2. Con EventManager seleccionado, ve a Inspector (derecha)
+   └─ Add Component
+      └─ Script → Arrastra Core/EventManager.cs (⭐ IMPORTANTE)
+
+3. Verifica Inspector:
+   └─ ✅ EventManager script está asignado
+   └─ ✅ NO hay errores rojos
+
+
+VERIFICACIÓN VISUAL:
+  ┌─ Inspector muestra
+  │
+  │  EventManager ✓
+  │  ├─ Transform
+  │  │  ├─ Position: (0, 0, 0)
+  │  │  └─ Rotation: (0, 0, 0)
+  │  ├─ EventManager (Script) ✓
+  │  │  └─ No hay errores rojos
+  │
+
+⚠️ CRÍTICO: Sin este GameObject, EventManager.Instance será NULL
+
+
+════════════════════════════════════════════════════════════════════════════════
+👤 PASO 3: VERIFICAR PLAYER
+════════════════════════════════════════════════════════════════════════════════
+
+VISUAL:
+  ┌─ Hierarchy
+  │
+  │  ┌─ Scene
+  │  │  ├─ Main Camera
+  │  │  ├─ GameManager
+  │  │  ├─ EventManager
+  │  │  ├─ 📍 Player         ← YA DEBE EXISTIR
+  │  │  └─ Enemy
+  │
+
+PASOS:
+
+1. En Hierarchy, haz clic en "Player"
+
+2. En Inspector, verifica:
+   ┌─ Transform
+   │  ├─ Position: (0, 0, 0) o tu inicio
+   │  └─ (sin cambios necesarios)
+   │
+   ├─ Rigidbody2D ✓
+   │  ├─ Body Type: Dynamic
+   │  ├─ Gravity Scale: 1
+   │  └─ Constraints: Freeze Rotation Z (recomendado)
+   │
+   ├─ Collider2D (CapsuleCollider2D o BoxCollider2D) ✓
+   │  ├─ Is Trigger: FALSE
+   │  └─ Size: (1, 2) o similar
+   │
+   └─ PlayerController (Script) ✓
+      └─ No hay errores rojos
+
+
+SI FALTA ALGO:
+  • Sin Rigidbody2D → Add Component → Physics2D → Rigidbody2D
+  • Sin Collider → Add Component → Physics2D → CapsuleCollider2D
+  • Sin PlayerController → Add Component → Script → PlayerController.cs
+
+
+════════════════════════════════════════════════════════════════════════════════
+📷 PASO 4: VERIFICAR MAIN CAMERA
+════════════════════════════════════════════════════════════════════════════════
+
+VISUAL:
+  ┌─ Hierarchy
+  │
+  │  ┌─ Scene
+  │  │  ├─ 📍 Main Camera    ← VERIFICA AQUÍ
+  │  │  ├─ GameManager
+  │  │  ├─ EventManager
+  │  │  ├─ Player
+  │  │  └─ Enemy
+  │
+
+PASOS:
+
+1. En Hierarchy, haz clic en "Main Camera"
+
+2. En Inspector, verifica:
+   ┌─ Transform
+   │  ├─ Position: varía (no importa si sigue al Player)
+   │  └─ No cambies esto
+   │
+   ├─ Camera ✓
+   │  ├─ Projection: Perspective
+   │  └─ FOV: 60 (o lo que ya tiene)
+   │
+   └─ CameraManager (Script) ✓
+      └─ No hay errores rojos
+
+
+SI FALTA CameraManager:
+  • Selecciona Main Camera
+  • Add Component → Script → CameraManager.cs
+
+
+CONFIGURACIÓN RECOMENDADA EN INSPECTOR:
+  ┌─ CameraManager
+  │
+  │  smoothSpeed: 5
+  │  lockX: false
+  │  lockY: false
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ PASO 5: VERIFICACIÓN FINAL ANTES DE PLAY
+════════════════════════════════════════════════════════════════════════════════
+
+CHECKLIST EN INSPECTOR:
+
+  GameManager GameObject:
+    [ ] Existe en Hierarchy
+    [ ] Tiene script Core/GameManager.cs
+    [ ] NO tiene errores rojos
+    [ ] Position: (0, 0, 0)
+
+  EventManager GameObject: (⭐ NUEVO)
+    [ ] Existe en Hierarchy
+    [ ] Tiene script Core/EventManager.cs
+    [ ] NO tiene errores rojos
+    [ ] Position: (0, 0, 0)
+
+  Player GameObject:
+    [ ] Existe en Hierarchy
+    [ ] Tiene Rigidbody2D
+    [ ] Tiene Collider2D (Is Trigger: FALSE)
+    [ ] Tiene script PlayerController.cs
+    [ ] NO tiene errores rojos
+
+  Main Camera GameObject:
+    [ ] Existe en Hierarchy
+    [ ] Tiene script CameraManager.cs
+    [ ] NO tiene errores rojos
+
+  Console (View → Console):
+    [ ] NO hay errores previos (Exception, error, etc)
+    [ ] Status: 0 errors, 0 warnings (relacionados a scripts)
+
+
+════════════════════════════════════════════════════════════════════════════════
+▶️ PASO 6: PRESIONA PLAY
+════════════════════════════════════════════════════════════════════════════════
+
+VISUAL EN UNITY:
+
+  ┌─ Top bar (arriba)
+  │
+  │  ┌─ Play button (⏯️) ← PRESIONA AQUÍ
+  │  │
+  │  │  [⏯️ Pause ◼️ Stop]
+  │  │
+  │  └─ Espera 1-2 segundos
+
+ESPERA POR:
+
+  Console debe mostrar (View → Console):
+  
+  ┌─ Console Output (abajo)
+  │
+  │  [GameManager] Inicializado | Ruta: ...
+  │  [GameManager] Nuevo juego creado
+  │  [EventManager] Inicializado
+  │
+  │  Status: 0 errors, 0 warnings
+  │
+
+
+VERIFICACIÓN VISUAL EN GAME VIEW:
+
+  ┌─ Game tab (cambiar de Scene a Game)
+  │
+  │  [ Tu escena se ve correctamente ]
+  │  [ Sin pantallas de error rojo ]
+  │  [ Player visible en pantalla ]
+  │
+
+
+════════════════════════════════════════════════════════════════════════════════
+🕹️ PASO 7: PRUEBA CONTROLES
+════════════════════════════════════════════════════════════════════════════════
+
+MIENTRAS ESTÁ EN PLAY, PRUEBA:
+
+Movimiento:
+  Presiona: A y D (o flechas izquierda/derecha)
+  Debe: Player se mueve horizontalmente
+  Verifica: Console NO tiene nuevos errores
+
+Salto:
+  Presiona: ESPACIO
+  Debe: Player salta si está en suelo
+  Verifica: Console NO tiene nuevos errores
+
+Dash (si implementado):
+  Presiona: SHIFT
+  Debe: Player hace dash rápido, se vuelve intangible
+  Verifica: Collider2D está deshabilitado durante dash
+  Verifica: Console NO tiene nuevos errores
+
+Ataque (si implementado):
+  Presiona: E
+  Debe: Player ataca
+  Verifica: Console NO tiene nuevos errores
+
+
+════════════════════════════════════════════════════════════════════════════════
+⏹️ PASO 8: PRESIONA STOP
+════════════════════════════════════════════════════════════════════════════════
+
+VISUAL:
+
+  ┌─ Top bar (arriba)
+  │
+  │  [ Play ◼️ STOP ] ← PRESIONA STOP
+  │
+  │  Espera 1 segundo
+
+
+VERIFICA:
+
+  [ ] Game view cambia a Scene view
+  [ ] Console sigue sin errores críticos
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎉 PASO 9: ¡SETUP COMPLETADO!
+════════════════════════════════════════════════════════════════════════════════
+
+Si llegaste aquí sin errores:
+
+  ✅ GameManager está inicializado
+  ✅ EventManager está inicializado
+  ✅ Player controller funciona
+  ✅ Camera sigue al player
+  ✅ Controles funcionan
+  ✅ No hay excepciones
+
+
+SIGUIENTE PASO:
+
+  1. Lee: ESTADO_ACTUAL.txt (para entender cambios)
+  2. Lee: CAMBIOS_DETECTADOS.txt (si escribiste código antes)
+  3. Lee: COMIENZA_AQUI.txt (para refactorizar scripts viejos)
+  4. Empieza a escribir nuevo código o refactorizar
+
+
+════════════════════════════════════════════════════════════════════════════════
+🐛 TROUBLESHOOTING VISUAL
+════════════════════════════════════════════════════════════════════════════════
+
+PROBLEMA 1: "Exception: EventManager Instance is null"
+─────────────────────────────────────────────────────────
+
+QUÉ VES EN CONSOLE:
+  NullReferenceException: Object reference not set to an instance...
+  ...EventManager...
+
+SOLUCIÓN:
+  1. Presiona STOP
+  2. En Hierarchy, verifica que "EventManager" GameObject existe
+  3. Si NO existe:
+     └─ Sigue PASO 2 de nuevo (Crear EventManager)
+  4. Si EXISTE pero tiene errores rojos:
+     └─ Verifica que tiene script Core/EventManager.cs
+
+
+PROBLEMA 2: "No puedo mover el player"
+──────────────────────────────────────
+
+QUÉ VES:
+  Presiones A/D pero nada sucede
+
+SOLUCIÓN:
+  1. Presiona STOP
+  2. Selecciona Player en Hierarchy
+  3. En Inspector, verifica:
+     [ ] Tiene Rigidbody2D
+     [ ] Body Type: Dynamic
+     [ ] Tiene Collider2D
+     [ ] Tiene PlayerController.cs
+  4. Si falta algo, agrégalo (Add Component)
+  5. Presiona PLAY de nuevo
+
+
+PROBLEMA 3: "Console muestra errores rojos"
+─────────────────────────────────────────────
+
+QUÉ HACER:
+  1. Lee el error en Console
+  2. Busca la línea del error
+  3. Abre el archivo .cs mencionado
+  4. Ve a la línea (Ctrl+G)
+  5. Verifica que esté correcta
+  6. Si es sobre EventManager:
+     └─ Lee CAMBIOS_DETECTADOS.txt
+
+
+PROBLEMA 4: "La escena está en negro"
+───────────────────────────────────────
+
+QUÉ HACER:
+  1. Presiona STOP
+  2. En Scene view, presiona F (focus) en Main Camera
+  3. Verifica que Camera está en posición correcta
+  4. Si aún está negro:
+     └─ Verifica que hay GameObjects en la escena
+     └─ Verifica que no están fuera de cámara
+
+
+PROBLEMA 5: "No compila"
+────────────────────────
+
+QUÉ HACER:
+  1. Abre Console (View → Console)
+  2. Lee el error (línea número y archivo)
+  3. Ve al archivo y línea
+  4. Verifica la sintaxis
+  5. Si es sobre EventManager:
+     └─ Reemplaza EventManager. → EventManager.Instance.
+
+
+════════════════════════════════════════════════════════════════════════════════
+📝 CONFIGURACIÓN RECOMENDADA (Opcional)
+════════════════════════════════════════════════════════════════════════════════
+
+PARA MEJOR DEBUGGING:
+
+1. En GameManager Inspector:
+   ┌─ Marca todos los logs como enabled
+   └─ Así verás "[GameManager]" en Console
+
+2. En EventManager Inspector:
+   ┌─ Similar (si hay opción de logging)
+   └─ Así verás "[EventManager]" en Console
+
+3. En Console (View → Console):
+   ┌─ Haz clic en "Collapse" para agrupar mensajes
+   └─ Así ves menos spam en Console
+
+
+════════════════════════════════════════════════════════════════════════════════
+✨ RESULTADO FINAL
+════════════════════════════════════════════════════════════════════════════════
+
+Cuando todo esté listo, tu Hierarchy se verá así:
+
+  Scene
+  ├─ Canvas (UI - opcional)
+  ├─ Main Camera
+  │  └─ CameraManager (Script)
+  │
+  ├─ GameManager (NEW SETUP)
+  │  └─ GameManager (Script)
+  │
+  ├─ EventManager (NEW SETUP - ⭐ IMPORTANTE)
+  │  └─ EventManager (Script)
+  │
+  ├─ Player
+  │  ├─ Rigidbody2D
+  │  ├─ Collider2D
+  │  ├─ PlayerController (Script)
+  │  └─ Sprite (o modelo visual)
+  │
+  ├─ Enemy
+  │  └─ (tus enemigos)
+  │
+  └─ Boss
+     └─ (tus bosses)
+
+
+Y Console muestra:
+  [GameManager] Inicializado | Ruta: ...
+  [GameManager] Nuevo juego creado
+  [EventManager] Inicializado
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎓 RESUMEN VISUAL
+════════════════════════════════════════════════════════════════════════════════
+
+PASOS (en orden):
+  1. Crear GameManager GameObject + script      (2 min)
+  2. Crear EventManager GameObject + script     (2 min) ⭐ NUEVO
+  3. Verificar Player tiene componentes         (2 min)
+  4. Verificar Main Camera tiene script         (1 min)
+  5. Verificación final en Inspector            (2 min)
+  6. Presionar PLAY                             (2 min)
+  7. Probar controles                           (3 min)
+  8. Presionar STOP                             (1 min)
+
+TIEMPO TOTAL: 15 minutos ✅
+
+RESULTADO:
+  ✅ Setup completamente funcional
+  ✅ Listo para empezar
+
+
+════════════════════════════════════════════════════════════════════════════════
+
+¿Necesitas ayuda? Revisa VERIFICACION_SETUP.txt
+
+¿Problemas? Ve TROUBLESHOOTING VISUAL arriba ↑
+
+¿Listo? Abre ESTADO_ACTUAL.txt →
+
+═════════════════════════════════════════════════════════════════════════════════
+
+Última actualización: 9 de Noviembre 2025
+Guía Visual: Setup Paso a Paso
+Tiempo de lectura: 10 minutos
+Tiempo de setup: 15 minutos
+
+╚════════════════════════════════════════════════════════════════════════════╝

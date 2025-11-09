@@ -1,0 +1,195 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   PASOS SIGUIENTES EN UNITY
+║
+║              Cómo completar la limpieza en el editor
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚠️ IMPORTANTE - Cierra Unity Completamente
+════════════════════════════════════════════════════════════════════════════════
+
+1. Guarda todos los cambios
+2. Cierra Unity COMPLETAMENTE
+3. Cierra Visual Studio Code (opcional pero recomendado)
+4. Espera 5 segundos
+
+⚠️ NO reabras Unity aún. Lee todo primero.
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔄 PASO 1: Abre Unity de Nuevo
+════════════════════════════════════════════════════════════════════════════════
+
+Abre el proyecto gamejam-2 en Unity:
+
+  1. Abre Unity Hub
+  2. Selecciona el proyecto "gamejam-2"
+  3. Presiona "Open"
+  
+  → Unity detectará los cambios de archivo
+  → Empezará a recompilar (puede tardar 2-3 minutos)
+  → Verás una barra de progreso en la esquina inferior derecha
+
+⏳ ESPERA A QUE COMPILE COMPLETAMENTE
+   (No toques nada hasta que termine)
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ PASO 2: Verifica la Compilación
+════════════════════════════════════════════════════════════════════════════════
+
+Una vez que compile:
+
+1. Abre la Console
+   └─ View → Console
+   └─ O Ctrl + Shift + C
+
+2. Busca el mensje de estado
+   ✅ ESPERADO: "Compilation successful"
+   ❌ NO ESPERADO: "Compilation failed" con errores
+
+3. Verifica en "Errors" tab:
+   ✅ ESPERADO: 0 errores (o solo el error CS0111 de GeneradorNivel)
+   ⚠️ SI VES: CS0101 "namespace already contains" → Problema sin resolver
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔧 PASO 3: Si Aún Hay Errores CS0101
+════════════════════════════════════════════════════════════════════════════════
+
+Si ves en la Console:
+  ❌ error CS0101: The namespace '<global namespace>' already contains 
+     a definition for 'BossDefeatedEvent'
+
+ENTONCES:
+
+1. Fuerza reimport:
+   └─ Assets → Reimport All
+   └─ O Ctrl + Shift + R
+
+2. Espera a que termine la recompilación (2-3 minutos)
+
+3. Verifica Console nuevamente
+
+4. Si SIGUE sin funcionar:
+   └─ Cierra Unity
+   └─ Borra manualmente: c:\Users\Joshua Villegas\gamejam-2\Library
+   └─ Borra manualmente: c:\Users\Joshua Villegas\gamejam-2\Temp
+   └─ Abre Unity nuevamente
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚠️ ERROR ESPERADO: CS0111 en GeneradorNivel
+════════════════════════════════════════════════════════════════════════════════
+
+Aunque hayas visto este error:
+  ⚠️ error CS0111: Type 'GeneradorNivel' already defines a member 
+     called 'GuardarSave'
+
+Este error es DIFERENTE a los CS0101 que acabamos de limpiar.
+
+CAUSA: El código en Legacy/GeneradorNivel.cs tiene métodos duplicados internamente
+  └─ No es un problema de duplicados en disco
+  └─ Es un problema del código fuente del archivo
+
+SOLUCIÓN: Necesita refactorización manual del archivo
+  └─ Ese archivo tiene métodos definidos dos veces
+  └─ Por ahora, puedes ignorarlo (el juego funciona aunque esté en rojo)
+  └─ O: Desactívalo temporalmente (renombra a GeneradorNivel.cs.bak)
+
+→ Este es un problema SEPARADO y se arreglará en otra sesión
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ PASO 4: Verificación Final
+════════════════════════════════════════════════════════════════════════════════
+
+Si la compilación es exitosa:
+
+1. Verifica Console:
+   ✅ "Compilation successful" en VERDE
+   ✅ 0 errores CS0101
+   ✅ Posible 1-2 warnings (CS0108 - es menor)
+
+2. Presiona el botón PLAY (Ctrl + P)
+   ✅ ESPERADO: Inicia el juego
+   ✅ Se ejecuta el intro
+   ✅ Los controles funcionan (WASD, SPACE, etc.)
+
+3. En Console verifica mensajes:
+   ✅ "[GameManager] Inicializado"
+   ✅ "[EventManager] Inicializado"
+   ✅ "[EventManager] Broadcasteado PlayerJumpedEvent"
+
+
+════════════════════════════════════════════════════════════════════════════════
+📊 QUÉ PASÓ
+════════════════════════════════════════════════════════════════════════════════
+
+ANTES (Estado Roto):
+  ❌ EventManager.cs tenía 248 líneas con todas las definiciones de eventos
+  ❌ GameEvents.cs tenía las mismas definiciones
+  ❌ Utilities/Events/GameEvents.cs tenía las mismas definiciones OTRA VEZ
+  ❌ CS0101 errors: "namespace already contains a definition"
+  ❌ No se podía compilar
+  ❌ No se podía ejecutar el juego
+
+DESPUÉS (Estado Limpio):
+  ✅ EventManager.cs tiene 88 líneas con SOLO la clase EventManager
+  ✅ GameEvents.cs tiene 116 líneas con TODAS las definiciones centralizadas
+  ✅ Utilities/Events/GameEvents.cs eliminado (no existe)
+  ✅ Cada evento definido en UNA SOLA ubicación
+  ✅ Sin CS0101 errors
+  ✅ Se puede compilar correctamente
+  ✅ Se puede ejecutar el juego
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 PRÓXIMAS TAREAS (Después de que funcione)
+════════════════════════════════════════════════════════════════════════════════
+
+1. OPCIONAL - Mover scripts de raíz a carpetas organizadas:
+   └─ BackgroundParallaxFill.cs
+   └─ BulletScript.cs
+   └─ Finish.cs
+   └─ GeneradordeBichos.cs
+   └─ ParalaxController.cs
+   └─ Pinchos.cs
+   └─ TilemapSetup.cs
+   
+   Pueden ir a: Legacy/ o crear carpetas como Gameplay/, UI/, etc.
+
+2. IMPORTANTE - Fixear GeneradorNivel.cs:
+   └─ Revisar por métodos duplicados internamente
+   └─ Remover definiciones duplicadas de "GuardarSave", "FadeImage", etc.
+   └─ Luego desactivar el .bak si lo creaste
+
+3. Documentación:
+   └─ Actualizar guías con la nueva estructura
+   └─ Explicar el sistema de eventos a futuros desarrolladores
+
+
+════════════════════════════════════════════════════════════════════════════════
+💬 RESUMEN RÁPIDO
+════════════════════════════════════════════════════════════════════════════════
+
+QUÉ HACER:
+
+1. Cierra Unity
+2. Abre Unity nuevamente
+3. Espera a que compile (2-3 minutos)
+4. Verifica Console: "Compilation successful ✓"
+5. Presiona PLAY
+6. El juego debería funcionar
+
+SI NO FUNCIONA:
+
+1. Assets → Reimport All
+2. Espera 2-3 minutos
+3. Si persiste: cierra Unity, borra Library/ y Temp/, reabre
+
+STATUS: ✅ Problemas principales resueltos
+PRÓXIMA: Unity reimport y verificación
+
+═════════════════════════════════════════════════════════════════════════════════

@@ -34,7 +34,8 @@ EN UNITY:
 
 3. Click derecho en Hierarchy → Create Empty
    └─ Nombra: "EventManager"
-   └─ (No necesita script, EventManager es estático)
+   └─ Adjunta script: Core/EventManager.cs
+   └─ (EventManager es un MonoBehaviour que gestiona eventos)
 
 4. Busca tu GameObject Player
    └─ REEMPLAZA: ControlesPersonaje.cs

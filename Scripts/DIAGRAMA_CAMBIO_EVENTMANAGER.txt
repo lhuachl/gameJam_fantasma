@@ -1,0 +1,361 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║              🔄 DIAGRAMA: EL CAMBIO DE EVENTMANAGER
+║                                                                            ║
+║              De Static Class → MonoBehaviour Singleton                    ║
+║                                                                            ║
+║                         9 Nov 2025                                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+════════════════════════════════════════════════════════════════════════════════
+ANTES (VIEJO PATRÓN) - Static Class
+════════════════════════════════════════════════════════════════════════════════
+
+    ┌─ Core/EventManager.cs
+    │
+    ├─ public static class EventManager     ← Static (no instance needed)
+    │   {
+    │       private static Dictionary<Type, ...> handlers;
+    │
+    │       public static void Subscribe<T>(Action<T> handler) { ... }
+    │       public static void Broadcast<T>(T evt) { ... }
+    │   }
+    │
+    └─ Uso en código:
+       
+       EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+       ↓
+       EventManager.Broadcast(new BossDefeatedEvent { ... });
+       
+
+PROBLEMAS:
+  ❌ No se ve en Inspector
+  ❌ No se puede debuggear fácilmente
+  ❌ No tiene state que persista
+  ❌ No compatible con patrón Singleton
+
+
+════════════════════════════════════════════════════════════════════════════════
+AHORA (NUEVO PATRÓN) - MonoBehaviour Singleton ⭐ CAMBIO
+════════════════════════════════════════════════════════════════════════════════
+
+    ┌─ Core/EventManager.cs
+    │
+    ├─ public class EventManager : MonoBehaviour     ← MonoBehaviour!
+    │   {
+    │       public static EventManager Instance { get; private set; }
+    │
+    │       private void Awake()
+    │       {
+    │           Instance = this;  ← Singleton pattern
+    │       }
+    │
+    │       private Dictionary<Type, ...> handlers;
+    │
+    │       public void Subscribe<T>(Action<T> handler) { ... }
+    │       public void Broadcast<T>(T evt) { ... }
+    │   }
+    │
+    └─ Uso en código:
+       
+       EventManager.Instance.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+       ↓
+       EventManager.Instance.Broadcast(new BossDefeatedEvent { ... });
+       
+
+VENTAJAS:
+  ✅ Visible en Inspector
+  ✅ Debuggeable en Inspector
+  ✅ Patrón consistente con GameManager
+  ✅ Puede persistir entre escenas (DontDestroyOnLoad)
+
+
+════════════════════════════════════════════════════════════════════════════════
+CÓMO ACTUALIZAR TU CÓDIGO
+════════════════════════════════════════════════════════════════════════════════
+
+OPCIÓN 1: Find & Replace (RECOMENDADO - 30 segundos)
+─────────────────────────────────────────────────────
+
+1. Ctrl+H (Find & Replace)
+
+2. Busca:    EventManager.Subscribe
+   Reemplaza: EventManager.Instance.Subscribe
+
+3. Busca:    EventManager.Broadcast
+   Reemplaza: EventManager.Instance.Broadcast
+
+4. Busca:    EventManager.Unsubscribe
+   Reemplaza: EventManager.Instance.Unsubscribe
+
+5. Presiona PLAY - ¡Listo!
+
+
+OPCIÓN 2: Manual (si tienes pocos archivos)
+──────────────────────────────────────────
+
+Abre cada archivo que usa EventManager y reemplaza:
+  
+  ❌ EventManager.Subscribe(...)      → ✅ EventManager.Instance.Subscribe(...)
+  ❌ EventManager.Broadcast(...)      → ✅ EventManager.Instance.Broadcast(...)
+  ❌ EventManager.Unsubscribe(...)    → ✅ EventManager.Instance.Unsubscribe(...)
+
+
+════════════════════════════════════════════════════════════════════════════════
+ANTES vs DESPUÉS - EJEMPLOS
+════════════════════════════════════════════════════════════════════════════════
+
+EJEMPLO 1: Suscribirse a un evento
+────────────────────────────────────
+
+ANTES:
+  ┌─ Boss.cs
+  │
+  │  void OnEnable()
+  │  {
+  │      EventManager.Subscribe<PlayerTakeDamageEvent>(OnPlayerHurt);
+  │  }
+  │
+  └─ PROBLEMA: Si no compilaba, no se ve el error claramente
+
+AHORA:
+  ┌─ Boss.cs
+  │
+  │  void OnEnable()
+  │  {
+  │      EventManager.Instance.Subscribe<PlayerTakeDamageEvent>(OnPlayerHurt);
+  │  }
+  │
+  └─ VENTAJA: Si Instance es null, error claro en Console
+
+
+EJEMPLO 2: Emitir evento
+─────────────────────────
+
+ANTES:
+  ┌─ Boss.cs
+  │
+  │  void Die()
+  │  {
+  │      EventManager.Broadcast(new BossDefeatedEvent { bossId = "boss1" });
+  │  }
+  │
+  └─ PROBLEMA: No se ve en Inspector qué está pasando
+
+AHORA:
+  ┌─ Boss.cs
+  │
+  │  void Die()
+  │  {
+  │      EventManager.Instance.Broadcast(new BossDefeatedEvent { bossId = "boss1" });
+  │  }
+  │
+  └─ VENTAJA: Puedes verlo y debuggearlo en Inspector
+
+
+EJEMPLO 3: Desuscribirse
+─────────────────────────
+
+ANTES:
+  ┌─ Player.cs
+  │
+  │  void OnDestroy()
+  │  {
+  │      EventManager.Unsubscribe<BossDefeatedEvent>(OnBossDefeated);
+  │  }
+  │
+  └─ PROBLEMA: Fácil olvidarlo
+
+AHORA:
+  ┌─ Player.cs
+  │
+  │  void OnDestroy()
+  │  {
+  │      EventManager.Instance.Unsubscribe<BossDefeatedEvent>(OnBossDefeated);
+  │  }
+  │
+  └─ VENTAJA: Patrón claro y consistente
+
+
+════════════════════════════════════════════════════════════════════════════════
+SETUP EN UNITY - LO NUEVO
+════════════════════════════════════════════════════════════════════════════════
+
+ANTES (Static):
+  
+  Scene
+  ├─ Player
+  ├─ Enemy
+  ├─ Boss
+  └─ (EventManager no necesitaba GameObject)
+
+  ✅ Funcionaba sin GameObjects de managers
+
+
+AHORA (MonoBehaviour):
+  
+  Scene
+  ├─ ⭐ EventManager (NEW!)
+  │   └─ Script: Core/EventManager.cs
+  ├─ ⭐ GameManager
+  │   └─ Script: Core/GameManager.cs
+  ├─ Player
+  ├─ Enemy
+  └─ Boss
+
+  ⚠️ EventManager NECESITA GameObject en Scene
+  ⚠️ GameManager NECESITA GameObject en Scene
+
+
+════════════════════════════════════════════════════════════════════════════════
+CHECKLIST: ¿TENGO QUE HACER ALGO?
+════════════════════════════════════════════════════════════════════════════════
+
+¿ESCRIBISTE CÓDIGO ANTES?
+
+  SÍ → Necesitas actualizar:
+       1. Find & Replace: EventManager. → EventManager.Instance.
+       2. Verifica que compila
+       3. Presiona PLAY
+
+  NO → Solo sigue adelante con el nuevo patrón
+
+
+════════════════════════════════════════════════════════════════════════════════
+COMPARACIÓN VISUAL: LADO A LADO
+════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────┬──────────────────────────────────┐
+│          ANTES (Static)         │      AHORA (MonoBehaviour)       │
+├─────────────────────────────────┼──────────────────────────────────┤
+│ Clase: static class             │ Clase: MonoBehaviour             │
+│ Ubicación: Utility              │ Ubicación: Core Manager          │
+│ Requiere GameObject: NO         │ Requiere GameObject: SÍ ⚠️       │
+│ Se ve en Inspector: NO          │ Se ve en Inspector: SÍ ✅        │
+│ Patrón: Static (único)          │ Patrón: Singleton Instance      │
+│ Llamada: EventManager.Method()  │ Llamada: EventManager.Instance..│
+│ Debug fácil: NO                 │ Debug fácil: SÍ ✅              │
+│ Persistencia: Automática        │ Persistencia: Manual (con flag)  │
+│ Compatibilidad: Baja            │ Compatibilidad: Alta ✅          │
+└─────────────────────────────────┴──────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+CÓDIGO SIDE-BY-SIDE COMPLETO
+════════════════════════════════════════════════════════════════════════════════
+
+ESCENA DE UN BOSS:
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ANTES (Viejo Código)                                                     │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  public class Boss : MonoBehaviour                                      │
+│  {                                                                       │
+│      void Start()                                                        │
+│      {                                                                   │
+│          EventManager.Subscribe<PlayerTakeDamageEvent>(OnPlayerHurt);  │
+│      }                                                                   │
+│                                                                          │
+│      void OnPlayerHurt(PlayerTakeDamageEvent evt)                       │
+│      {                                                                   │
+│          print("Player fue golpeado!");                                 │
+│      }                                                                   │
+│                                                                          │
+│      void Die()                                                          │
+│      {                                                                   │
+│          EventManager.Broadcast(new BossDefeatedEvent                  │
+│          {                                                               │
+│              bossId = "FireBoss",                                        │
+│              levelNumber = GameManager.Instance.GetCurrentLevel()        │
+│          });                                                             │
+│      }                                                                   │
+│                                                                          │
+│      void OnDestroy()                                                    │
+│      {                                                                   │
+│          EventManager.Unsubscribe<PlayerTakeDamageEvent>(OnPlayerHurt);│
+│      }                                                                   │
+│  }                                                                       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+             ⬇️⬇️⬇️ ACTUALIZAR ⬇️⬇️⬇️
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ AHORA (Código Actualizado)                                              │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  public class Boss : MonoBehaviour                                      │
+│  {                                                                       │
+│      void Start()                                                        │
+│      {                                                                   │
+│          EventManager.Instance.Subscribe<PlayerTakeDamageEvent>(       │
+│              OnPlayerHurt                                               │
+│          );                                                              │
+│      }                                                                   │
+│                                                                          │
+│      void OnPlayerHurt(PlayerTakeDamageEvent evt)                       │
+│      {                                                                   │
+│          print("Player fue golpeado!");                                 │
+│      }                                                                   │
+│                                                                          │
+│      void Die()                                                          │
+│      {                                                                   │
+│          EventManager.Instance.Broadcast(new BossDefeatedEvent         │
+│          {                                                               │
+│              bossId = "FireBoss",                                        │
+│              levelNumber = GameManager.Instance.GetCurrentLevel()        │
+│          });                                                             │
+│      }                                                                   │
+│                                                                          │
+│      void OnDestroy()                                                    │
+│      {                                                                   │
+│          EventManager.Instance.Unsubscribe<PlayerTakeDamageEvent>(     │
+│              OnPlayerHurt                                               │
+│          );                                                              │
+│      }                                                                   │
+│  }                                                                       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+CAMBIOS (7 líneas afectadas):
+  Línea 8:  EventManager. → EventManager.Instance.
+  Línea 18: EventManager.Broadcast → EventManager.Instance.Broadcast
+  Línea 30: EventManager.Unsubscribe → EventManager.Instance.Unsubscribe
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 RESUMEN: QUÉ HACER AHORA
+════════════════════════════════════════════════════════════════════════════════
+
+1. ENTENDER EL CAMBIO
+   ✅ EventManager cambió de static class a MonoBehaviour
+   ✅ Requiere GameObject en Scene
+   ✅ Patrón: EventManager.Instance.Method() (igual que GameManager)
+
+2. ACTUALIZAR CÓDIGO VIEJO (Si lo tienes)
+   ✅ Ctrl+H: EventManager. → EventManager.Instance.
+   ✅ 3 reemplazos (Subscribe, Broadcast, Unsubscribe)
+   ✅ Presiona PLAY
+
+3. NUEVO CÓDIGO
+   ✅ Siempre usa EventManager.Instance.Method()
+   ✅ Nunca EventManager.Method() (eso ya no existe)
+
+4. SETUP EN UNITY
+   ✅ Crea GameObject "EventManager" en Scene
+   ✅ Adjunta Core/EventManager.cs
+   ✅ Mark as DontDestroyOnLoad
+
+¿LISTO? 🚀
+
+Próximo paso: Lee CAMBIOS_DETECTADOS.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+
+Última actualización: 9 de Noviembre 2025
+Diagrama Visual: EventManager Migration
+Tiempo de lectura: 8 minutos
+
+╚════════════════════════════════════════════════════════════════════════════╝

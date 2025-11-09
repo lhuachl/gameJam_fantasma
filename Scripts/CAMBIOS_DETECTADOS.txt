@@ -1,0 +1,261 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        🔄 ACTUALIZACIÓN DE CAMBIOS                        ║
+║                                                                            ║
+║                 Revisión del Setup - 9 de Noviembre 2025                 ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════════
+🔍 CAMBIOS DETECTADOS
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO IMPORTANTE #1: EventManager ahora es MonoBehaviour
+───────────────────────────────────────────────────────────────────────────
+
+ANTES:
+  ❌ EventManager era estático
+  ❌ Se usaba: EventManager.Broadcast<T>(event)
+  ❌ No necesitaba GameObject en escena
+
+AHORA:
+  ✅ EventManager es MonoBehaviour
+  ✅ Se usa: EventManager.Instance.Broadcast<T>(event)
+  ✅ NECESITA GameObject con script en escena
+  ✅ Es un Singleton con DontDestroyOnLoad
+  ✅ Mismo patrón que GameManager
+
+IMPACTO:
+  ✅ Más flexible
+  ✅ Fácil acceder desde Inspector
+  ✅ Mejor debugging
+  ✅ Consistente con GameManager
+
+
+CAMBIO #2: README.md en cada carpeta
+─────────────────────────────────────
+
+NUEVO:
+  ✅ Core/README.md - Documentación de GameManager
+  ✅ Data/README.md - Documentación de GameSaveData
+  ✅ Utilities/README.md - Documentación de Events e Interfaces
+  ✅ Entities/README.md - Documentación de Entities
+  ✅ Managers/README.md - Documentación de Managers
+
+BENEFICIO:
+  ✅ Referencia rápida sin salir del IDE
+  ✅ Autocomplete con ejemplos
+  ✅ Mejor navegación del proyecto
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📋 CHECKLIST ACTUALIZADO PARA SETUP
+═══════════════════════════════════════════════════════════════════════════════
+
+EN UNITY - HIERARCHY:
+
+[ ] Crea Empty GameObject: "GameManager"
+    └─ Adjunta: Core/GameManager.cs
+    └─ En Inspector: Debug Mode = true
+
+[ ] Crea Empty GameObject: "EventManager"
+    └─ Adjunta: Core/EventManager.cs ✅ (CAMBIO: SÍ necesita script)
+    └─ En Inspector: (Sin configuración adicional)
+
+[ ] Player GameObject
+    └─ REEMPLAZA: ControlesPersonaje.cs
+    └─ AGREGA: Entities/Player/PlayerController.cs
+    └─ Configura parámetros como antes
+
+[ ] Camera GameObject
+    └─ AGREGA: Managers/CameraManager.cs
+    └─ Asigna: Target = Player
+
+[ ] Presiona PLAY
+    └─ Console debe mostrar:
+       "[GameManager] Inicializado | Ruta: ..."
+       "[GameManager] Nuevo juego creado"
+       "[EventManager] Inicializado"
+
+
+═══════════════════════════════════════════════════════════════════════════════
+🔧 CÓMO USAR EventManager (ACTUALIZADO)
+═══════════════════════════════════════════════════════════════════════════════
+
+SUSCRIBIRSE A EVENTOS:
+
+ANTES (estático):
+  ❌ EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+
+AHORA (MonoBehaviour):
+  ✅ EventManager.Instance.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+
+
+DISPARAR EVENTOS:
+
+ANTES (estático):
+  ❌ EventManager.Broadcast(new BossDefeatedEvent { bossId = "boss1" });
+
+AHORA (MonoBehaviour):
+  ✅ EventManager.Instance.Broadcast(new BossDefeatedEvent { bossId = "boss1" });
+
+
+EJEMPLO COMPLETO:
+
+```csharp
+public class Boss : MonoBehaviour, IBoss
+{
+    private void Start()
+    {
+        // Suscribirse a eventos
+        EventManager.Instance.Subscribe<PlayerDashedEvent>(OnPlayerDashed);
+    }
+
+    private void OnDestroy()
+    {
+        // Desuscribirse
+        EventManager.Instance.Unsubscribe<PlayerDashedEvent>(OnPlayerDashed);
+    }
+
+    private void OnPlayerDashed(PlayerDashedEvent evt)
+    {
+        Debug.Log("¡El jugador está daseando!");
+    }
+
+    public void Die()
+    {
+        // Broadcast evento cuando muere
+        EventManager.Instance.Broadcast(new BossDefeatedEvent
+        {
+            bossId = "boss1",
+            levelNumber = GameManager.Instance.GetCurrentLevel()
+        });
+
+        Destroy(gameObject);
+    }
+}
+```
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📚 DOCUMENTACIÓN ACTUALIZADA
+═══════════════════════════════════════════════════════════════════════════════
+
+ARCHIVOS ACTUALIZADOS:
+  ✅ QUICK_START.txt - Paso 2 (EventManager sí necesita script)
+  ✅ COMIENZA_AQUI.txt - Paso 1 (EventManager es MonoBehaviour)
+
+NUEVOS FILES PARA REFERENCIA:
+  ✅ Core/README.md - Cómo usar GameManager
+  ✅ Data/README.md - Estructura de GameSaveData
+  ✅ Utilities/README.md - Eventos e interfaces
+  ✅ Entities/README.md - Estructura de entidades
+  ✅ Managers/README.md - Managers disponibles
+
+CÓMO ACCEDER:
+  → En VS Code: abre cualquier carpeta
+  → En Unity: doble-click en folder, verás README.md
+  → Búsqueda rápida en documentación
+
+
+═══════════════════════════════════════════════════════════════════════════════
+⚠️ MIGRACIÓN: Si ya comenzaste con el anterior
+═══════════════════════════════════════════════════════════════════════════════
+
+Si ya escribiste código con el EventManager estático:
+
+PASO 1: Encontrar todos los usos
+  Busca en proyecto: "EventManager."
+  Deberías encontrar:
+    ✅ EventManager.Subscribe
+    ✅ EventManager.Unsubscribe
+    ✅ EventManager.Broadcast
+
+PASO 2: Actualizar a EventManager.Instance
+  Reemplazar:
+    ❌ EventManager.Subscribe → EventManager.Instance.Subscribe
+    ❌ EventManager.Broadcast → EventManager.Instance.Broadcast
+    ❌ EventManager.Unsubscribe → EventManager.Instance.Unsubscribe
+
+PASO 3: Verificar en Inspector
+  Asegurarse que EventManager GameObject está en escena
+
+PASO 4: Pruebar
+  Presiona PLAY
+  Verifica que eventos se disparan en Console
+
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ VERIFICACIÓN: Todo está correcto si...
+═══════════════════════════════════════════════════════════════════════════════
+
+CHECKLIST:
+
+[ ] GameManager GameObject existe en escena
+    └─ Tiene script Core/GameManager.cs
+    └─ Debug Mode = true
+
+[ ] EventManager GameObject existe en escena
+    └─ Tiene script Core/EventManager.cs ✅ (NUEVO CAMBIO)
+
+[ ] Al presionar PLAY en Console ves:
+    "[GameManager] Inicializado | Ruta: ..."
+    "[GameManager] Nuevo juego creado"
+    "[EventManager] Inicializado"
+
+[ ] Llamadas a eventos usan EventManager.Instance:
+    ✅ EventManager.Instance.Subscribe<T>(handler)
+    ✅ EventManager.Instance.Broadcast(event)
+
+[ ] PlayerController está en Player GameObject
+    └─ Configura Ground Check y Ground Layer
+
+[ ] CameraManager está en Camera GameObject
+    └─ Target asignado a Player
+
+[ ] PUEDES COMPILAR sin errores
+
+Si todos estos checkmarks pasan: ✅ SETUP CORRECTO
+
+
+═══════════════════════════════════════════════════════════════════════════════
+🚀 PRÓXIMOS PASOS (Sin cambios)
+═══════════════════════════════════════════════════════════════════════════════
+
+Continúa con:
+  1. COMIENZA_AQUI.txt PASO 2 (Refactorizar scripts viejos)
+  2. Crear MenuManager.cs
+  3. Refactorizar LevelManager
+  4. Agregar broadcasts en Boss y Finish
+
+Todo sigue igual, solo:
+  ✅ Usa EventManager.Instance en lugar de estático
+  ✅ Asegúrate que EventManager GameObject está en escena
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📞 SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO PRINCIPAL:
+  EventManager: static → MonoBehaviour
+
+IMPACTO EN MI CÓDIGO:
+  Si NO escribiste código aún: NINGUNO (solo sigue QUICK_START.txt)
+  Si ESCRIBISTE código: Reemplaza "EventManager." → "EventManager.Instance."
+
+ACTUALIZACIÓN EN DOCS:
+  ✅ QUICK_START.txt - Actualizado
+  ✅ COMIENZA_AQUI.txt - Actualizado
+  ✅ README.md en carpetas - Nuevo
+
+¿LISTO?
+  → Abre QUICK_START.txt
+  → Sigue los 4 pasos
+  → Recuerda: EventManager.cs SÍ necesita script
+  → ¡Adelante!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Última actualización: 9 de Noviembre 2025
+
+╚════════════════════════════════════════════════════════════════════════════╝

@@ -45,7 +45,8 @@
    └─ Adjunta script: Core/GameManager.cs
 
 3. Crea un GameObject llamado "EventManager"
-   └─ (No necesita script, EventManager es estático)
+   └─ Adjunta script: Core/EventManager.cs
+   └─ EventManager es un MonoBehaviour que gestiona eventos
 
 4. Crea o actualiza tu Player GameObject
    └─ Reemplaza ControlesPersonaje.cs con Entities/Player/PlayerController.cs

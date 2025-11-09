@@ -1,0 +1,479 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   🗺️ MAPA DE NAVEGACIÓN RÁPIDA
+║                                                                            ║
+║           Encuentra lo que necesitas en 3 segundos                       ║
+║                                                                            ║
+║                     9 Nov 2025 - Quick Navigator                         ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔍 BÚSQUEDA RÁPIDA - ¿QUÉ NECESITAS?
+════════════════════════════════════════════════════════════════════════════════
+
+Palabra clave                    Archivo a leer
+─────────────────────────────────────────────────────────────────────────
+"Empieza aquí"                  _COMIENZA_AQUI_PRIMERO.txt (entry point)
+"Resumen del proyecto"           RESUMEN_VISUAL.txt
+"Estado actual"                 ESTADO_ACTUAL.txt
+"Qué cambió"                    CAMBIOS_DETECTADOS.txt
+"Setup en Unity"                QUICK_START.txt o PASO_A_PASO_VISUAL.txt
+"Verificar que funciona"        VERIFICACION_SETUP.txt
+"EventManager cambió"           DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+"Refactorizar código viejo"    COMIENZA_AQUI.txt
+"Arquitectura profunda"         ARQUITECTURA_BRUTAL.txt
+"Ubicación de archivos"         MAP_STRUCTURE.txt
+"Cómo usar GameManager"         Core/README.md
+"Cómo usar EventManager"        Utilities/README.md
+"SaveData estructura"           Data/README.md
+"Interfaces disponibles"        Utilities/README.md
+"Dónde pongo código"            MAP_STRUCTURE.txt
+"Rutas de lectura"              LECTURA_RECOMENDADA.txt
+"Índice completo"               INDICE_MAESTRO.txt
+"¿Qué se creó hoy?"            RESUMEN_SESION_HOY.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+⏱️ POR TIEMPO DISPONIBLE
+════════════════════════════════════════════════════════════════════════════════
+
+TENGO 3 MINUTOS:
+  → RESUMEN_VISUAL.txt
+
+TENGO 10 MINUTOS:
+  → RESUMEN_VISUAL.txt + ESTADO_ACTUAL.txt
+
+TENGO 30 MINUTOS:
+  → RESUMEN_VISUAL.txt
+  → ESTADO_ACTUAL.txt
+  → QUICK_START.txt (primeras 2 secciones)
+
+TENGO 1 HORA:
+  → _COMIENZA_AQUI_PRIMERO.txt (ruta rápida)
+
+TENGO 2 HORAS:
+  → _COMIENZA_AQUI_PRIMERO.txt (ruta balanceada)
+
+TENGO 3+ HORAS:
+  → _COMIENZA_AQUI_PRIMERO.txt (ruta experto)
+
+
+════════════════════════════════════════════════════════════════════════════════
+👤 POR SITUACIÓN/ROL
+════════════════════════════════════════════════════════════════════════════════
+
+SOY NUEVO EN EL PROYECTO:
+  1. _COMIENZA_AQUI_PRIMERO.txt
+  2. RESUMEN_VISUAL.txt
+  3. ESTADO_ACTUAL.txt
+  4. QUICK_START.txt
+  5. PASO_A_PASO_VISUAL.txt
+
+ESCRIBÍ CÓDIGO ANTES:
+  1. CAMBIOS_DETECTADOS.txt
+  2. DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+  3. Buscar/reemplazar EventManager. → EventManager.Instance.
+  4. Presionar PLAY
+
+NECESITO REFERENCIA RÁPIDA:
+  → Core/README.md (GameManager)
+  → Utilities/README.md (EventManager)
+  → Data/README.md (SaveData)
+
+SOY ARQUITECTO/DISEÑADOR:
+  → ARQUITECTURA_BRUTAL.txt
+  → MAP_STRUCTURE.txt
+  → Core/README.md
+
+NECESITO VERIFICAR SETUP:
+  → VERIFICACION_SETUP.txt
+  → PASO_A_PASO_VISUAL.txt
+
+NECESITO TROUBLESHOOTING:
+  → PASO_A_PASO_VISUAL.txt (sección troubleshooting)
+  → VERIFICACION_SETUP.txt (paso 9)
+
+
+════════════════════════════════════════════════════════════════════════════════
+📂 POR CARPETA/UBICACIÓN
+════════════════════════════════════════════════════════════════════════════════
+
+Core/:
+  ├─ GameManager.cs
+  ├─ EventManager.cs
+  └─ 📖 README.md (API + ejemplos)
+
+Data/:
+  ├─ GameSaveData.cs
+  └─ 📖 README.md (estructura + campos)
+
+Utilities/:
+  ├─ Events/
+  │  ├─ GameEvents.cs
+  │  ├─ EventManager.cs
+  │  └─ 📖 README.md
+  │
+  └─ Interfaces/
+     ├─ IDamageable.cs
+     ├─ IEnemy.cs
+     ├─ IBoss.cs
+     └─ 📖 README.md
+
+Entities/
+  ├─ Player/PlayerController.cs
+  ├─ Enemy/Base/ (ready for implementation)
+  └─ Boss/ (ready for implementation)
+
+Managers/
+  ├─ CameraManager.cs
+  └─ 📖 README.md
+
+Documentation/:
+  ├─ _COMIENZA_AQUI_PRIMERO.txt (START HERE)
+  ├─ RESUMEN_VISUAL.txt
+  ├─ ESTADO_ACTUAL.txt
+  ├─ CAMBIOS_DETECTADOS.txt
+  ├─ QUICK_START.txt
+  ├─ PASO_A_PASO_VISUAL.txt
+  ├─ VERIFICACION_SETUP.txt
+  ├─ DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+  ├─ COMIENZA_AQUI.txt
+  ├─ ARQUITECTURA_BRUTAL.txt
+  ├─ MAP_STRUCTURE.txt
+  ├─ LECTURA_RECOMENDADA.txt
+  ├─ INDICE_MAESTRO.txt
+  ├─ RESUMEN_SESION_HOY.txt
+  ├─ MAPA_NAVEGACION_RAPIDA.txt (THIS FILE)
+  └─ + legacy files
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 POR OBJETIVO
+════════════════════════════════════════════════════════════════════════════════
+
+OBJETIVO: Entender el proyecto
+  → RESUMEN_VISUAL.txt (5 min)
+  → COMIENZA_AQUI.txt (30 min)
+  → ARQUITECTURA_BRUTAL.txt (1 hora)
+
+OBJETIVO: Setup en Unity
+  → QUICK_START.txt (20 min)
+  → PASO_A_PASO_VISUAL.txt (15 min)
+  → VERIFICACION_SETUP.txt (10 min)
+
+OBJETIVO: Escribir código
+  → Core/README.md (5 min)
+  → Utilities/README.md (5 min)
+  → MAP_STRUCTURE.txt (10 min)
+
+OBJETIVO: Debuggear problema
+  → PASO_A_PASO_VISUAL.txt (troubleshooting)
+  → VERIFICACION_SETUP.txt (checklist)
+  → Relevante README.md
+
+OBJETIVO: Migrar código anterior
+  → CAMBIOS_DETECTADOS.txt (15 min)
+  → DIAGRAMA_CAMBIO_EVENTMANAGER.txt (8 min)
+  → Ctrl+H en scripts
+
+OBJETIVO: Aprender patrones
+  → ARQUITECTURA_BRUTAL.txt (1 hora)
+  → Core/README.md (10 min)
+  → Utilities/README.md (10 min)
+
+OBJETIVO: Refactorizar scripts viejos
+  → COMIENZA_AQUI.txt (30 min)
+  → Relevante README.md (5-10 min)
+  → MAP_STRUCTURE.txt (10 min)
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚡ ATAJOS - "Solo quiero lo esencial"
+════════════════════════════════════════════════════════════════════════════════
+
+¿CÓMO CONFIGURO EN UNITY? (15 minutos)
+  1. Lee: QUICK_START.txt (primeros 4 pasos)
+  2. O Lee: PASO_A_PASO_VISUAL.txt (todos los pasos visuales)
+  3. Hazlo en Unity
+  4. Presiona PLAY
+  → LISTO
+
+¿POR QUÉ CAMBIÓ EVENTMANAGER? (8 minutos)
+  1. Lee: DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+  2. Ve los antes/después
+  3. Entiende el cambio
+  → LISTO
+
+¿CÓMO ACTUALIZO MI CÓDIGO? (30 minutos)
+  1. Lee: CAMBIOS_DETECTADOS.txt (sección "Migración")
+  2. Ctrl+H en tu editor
+  3. Busca/reemplaza 3 patrones
+  4. Presiona PLAY
+  → LISTO
+
+¿CÓMO USO GAMEMANAGER? (5 minutos)
+  1. Abre: Core/README.md
+  2. Busca: "Uso Básico"
+  3. Copia ejemplo
+  → LISTO
+
+¿CÓMO USO EVENTMANAGER? (5 minutos)
+  1. Abre: Utilities/README.md
+  2. Busca: "Uso Básico"
+  3. Copia ejemplo
+  → LISTO
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔗 REFERENCIAS CRUZADAS
+════════════════════════════════════════════════════════════════════════════════
+
+Si estás leyendo...           Luego lee...
+─────────────────────────────────────────────────────────────────────────
+_COMIENZA_AQUI_PRIMERO   →   RESUMEN_VISUAL
+RESUMEN_VISUAL           →   ESTADO_ACTUAL
+ESTADO_ACTUAL            →   CAMBIOS_DETECTADOS
+CAMBIOS_DETECTADOS       →   DIAGRAMA_CAMBIO_EVENTMANAGER
+QUICK_START              →   PASO_A_PASO_VISUAL
+PASO_A_PASO_VISUAL       →   VERIFICACION_SETUP
+VERIFICACION_SETUP       →   README.md de carpetas
+COMIENZA_AQUI            →   ARQUITECTURA_BRUTAL
+ARQUITECTURA_BRUTAL      →   Core/README.md
+Core/README.md           →   Utilities/README.md
+Utilities/README.md      →   Data/README.md
+MAP_STRUCTURE            →   Leer archivos .cs
+LECTURA_RECOMENDADA      →   Archivos específicos mencionados
+INDICE_MAESTRO           →   Cualquier archivo que necesites
+
+
+════════════════════════════════════════════════════════════════════════════════
+📊 MATRIZ DE DOCUMENTACIÓN
+════════════════════════════════════════════════════════════════════════════════
+
+                    Nivel de Detalle
+                LOW        MED        HIGH
+SETUP           QUICK      PASO A     VERIFI-
+                START      PASO       CACION
+
+API REF         README.md  ARQUI      -
+                          TECTURA
+
+CONCEPTOS       RESUMEN    COMIENZA   ARQUI
+                VISUAL     AQUI       TECTURA
+
+CAMBIOS         ESTADO     CAMBIOS    DIAGRA-
+                ACTUAL     DETECTA    MA
+
+NAVEGACION      LECTURA    INDICE     MAPA
+                RECO       MAESTRO    AQUI
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST: ¿YA LO LEÍSTE?
+════════════════════════════════════════════════════════════════════════════════
+
+LECTURA ESENCIAL (Primero):
+  [ ] _COMIENZA_AQUI_PRIMERO.txt
+  [ ] RESUMEN_VISUAL.txt
+  [ ] ESTADO_ACTUAL.txt
+
+LECTURA IMPORTANTE (Segundo):
+  [ ] QUICK_START.txt (si no hiciste setup)
+  [ ] CAMBIOS_DETECTADOS.txt (si escribiste código)
+  [ ] PASO_A_PASO_VISUAL.txt (si necesitas setup visual)
+
+REFERENCIA (Según necesites):
+  [ ] Core/README.md (usando GameManager)
+  [ ] Utilities/README.md (usando EventManager)
+  [ ] MAP_STRUCTURE.txt (colocando código nuevo)
+  [ ] Data/README.md (guardando datos)
+  [ ] ARQUITECTURA_BRUTAL.txt (aprendiendo sistema)
+
+VERIFICACIÓN:
+  [ ] VERIFICACION_SETUP.txt (setup funcionando)
+
+SI TODO ESTÁ CHECK:
+  ✅ Listo para empezar a codificar
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 PUNTO DE ENTRADA POR CONTEXTO
+════════════════════════════════════════════════════════════════════════════════
+
+"Me dijeron que empiece con este proyecto"
+  → _COMIENZA_AQUI_PRIMERO.txt
+
+"Necesito setup en Unity en 30 minutos"
+  → QUICK_START.txt
+
+"Necesito setup en Unity visualizado paso a paso"
+  → PASO_A_PASO_VISUAL.txt
+
+"Escribí código y nada funciona"
+  → PASO_A_PASO_VISUAL.txt (troubleshooting)
+
+"Escribí código ANTES de hoy y necesito actualizarlo"
+  → CAMBIOS_DETECTADOS.txt
+
+"Necesito entender la arquitectura"
+  → ARQUITECTURA_BRUTAL.txt
+
+"Necesito referencia rápida de GameManager"
+  → Core/README.md
+
+"Necesito referencia rápida de EventManager"
+  → Utilities/README.md
+
+"Necesito saber dónde poner código"
+  → MAP_STRUCTURE.txt
+
+"Necesito verificar que todo está bien"
+  → VERIFICACION_SETUP.txt
+
+"No sé por dónde empezar"
+  → Este archivo (MAPA_NAVEGACION_RAPIDA.txt)
+
+
+════════════════════════════════════════════════════════════════════════════════
+🆘 PROBLEMAS COMUNES - DÓNDE BUSCAR
+════════════════════════════════════════════════════════════════════════════════
+
+PROBLEMA                          SOLUCIÓN
+─────────────────────────────────────────────────────────────────────────
+"No compila"                      PASO_A_PASO_VISUAL.txt (troubleshooting)
+"EventManager.Instance es null"   QUICK_START.txt paso 2
+"No sé cómo empezar"             _COMIENZA_AQUI_PRIMERO.txt
+"¿Por qué cambió EventManager?"  DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+"Cómo actualizar código viejo"   CAMBIOS_DETECTADOS.txt
+"¿Dónde va el código nuevo?"     MAP_STRUCTURE.txt
+"Necesito entender los eventos"  Utilities/README.md
+"Necesito entender GameManager"  Core/README.md
+"¿Qué cambió recientemente?"     ESTADO_ACTUAL.txt
+"¿Cuál es el estado del proyecto" RESUMEN_VISUAL.txt
+
+
+════════════════════════════════════════════════════════════════════════════════
+💡 TIPS DE NAVEGACIÓN
+════════════════════════════════════════════════════════════════════════════════
+
+TIP 1: Usar Ctrl+F para buscar dentro del archivo
+  Ej: "Ctrl+F" → Busca "EventManager"
+
+TIP 2: Leer siempre desde _COMIENZA_AQUI_PRIMERO.txt
+  Es el punto de entrada único y organizado
+
+TIP 3: Usar README.md para referencia rápida
+  Están en cada carpeta (Core/, Utilities/, etc)
+
+TIP 4: Consultar INDICE_MAESTRO.txt cuando estés perdido
+  Tiene matriz de decisión de qué leer
+
+TIP 5: Si tienes poco tiempo, usar LECTURA_RECOMENDADA.txt
+  Tiene rutas optimizadas por tiempo
+
+TIP 6: Usar VERIFICACION_SETUP.txt mientras configuras
+  Ten abierto en otra ventana
+
+TIP 7: Usar DIAGRAMA_CAMBIO_EVENTMANAGER.txt si no entiende cambio
+  Los diagramas lado a lado ayudan mucho
+
+TIP 8: Volver a este archivo si te pierdes
+  Es un mapa rápido de todo
+
+
+════════════════════════════════════════════════════════════════════════════════
+📍 MAPA GEOGRÁFICO (dónde está cada cosa)
+════════════════════════════════════════════════════════════════════════════════
+
+En Assets/Scripts/:
+
+ENTRADA (Start here)
+  ├─ _COMIENZA_AQUI_PRIMERO.txt ← START
+  └─ MAPA_NAVEGACION_RAPIDA.txt ← YOU ARE HERE
+
+OVERVIEW (Entender proyecto)
+  ├─ RESUMEN_VISUAL.txt
+  ├─ RESUMEN_SESION_HOY.txt
+  └─ ESTADO_ACTUAL.txt
+
+ACCIÓN (Hacer setup)
+  ├─ QUICK_START.txt
+  ├─ PASO_A_PASO_VISUAL.txt
+  └─ VERIFICACION_SETUP.txt
+
+CAMBIOS (Qué pasó)
+  ├─ CAMBIOS_DETECTADOS.txt
+  ├─ DIAGRAMA_CAMBIO_EVENTMANAGER.txt
+  └─ ESTADO_ACTUAL.txt
+
+GUÍAS (Cómo hacer cosas)
+  ├─ COMIENZA_AQUI.txt
+  ├─ ARQUITECTURA_BRUTAL.txt
+  └─ MAP_STRUCTURE.txt
+
+NAVEGACIÓN (Dónde buscar)
+  ├─ LECTURA_RECOMENDADA.txt
+  ├─ INDICE_MAESTRO.txt
+  └─ INDICE_ARCHIVOS.txt (legacy)
+
+REFERENCIA (API rápida)
+  ├─ Core/README.md
+  ├─ Data/README.md
+  ├─ Utilities/README.md
+  ├─ Entities/README.md
+  └─ Managers/README.md
+
+CÓDIGO
+  ├─ Core/ (GameManager, EventManager)
+  ├─ Data/ (GameSaveData)
+  ├─ Utilities/ (Events, Interfaces)
+  ├─ Entities/ (Player, Enemy, Boss)
+  ├─ Managers/ (CameraManager)
+  ├─ Level/ (vacío, listo)
+  ├─ UI/ (vacío, listo)
+  └─ Prefabs/ (vacío, listo)
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 TU PRÓXIMO PASO
+════════════════════════════════════════════════════════════════════════════════
+
+Estás leyendo este archivo (MAPA_NAVEGACION_RAPIDA.txt)
+
+PRÓXIMO PASO:
+
+1. Decide cuánto tiempo tienes:
+   ├─ 5 min  → RESUMEN_VISUAL.txt
+   ├─ 15 min → + ESTADO_ACTUAL.txt
+   ├─ 1 hora → + QUICK_START.txt
+   └─ 2+ horas → Lee _COMIENZA_AQUI_PRIMERO.txt
+
+2. O decide tu rol:
+   ├─ Nuevo en proyecto → _COMIENZA_AQUI_PRIMERO.txt
+   ├─ Tengo código anterior → CAMBIOS_DETECTADOS.txt
+   ├─ Necesito setup → QUICK_START.txt
+   ├─ Soy arquitecto → ARQUITECTURA_BRUTAL.txt
+   └─ Necesito referencia → README.md de la carpeta
+
+3. Abre ese archivo
+
+4. Sigue las instrucciones
+
+¡LISTO!
+
+
+════════════════════════════════════════════════════════════════════════════════
+
+¿Necesitas más información?
+
+→ INDICE_MAESTRO.txt (índice completo)
+→ _COMIENZA_AQUI_PRIMERO.txt (punto de entrada)
+→ LECTURA_RECOMENDADA.txt (rutas por situación)
+
+═════════════════════════════════════════════════════════════════════════════════
+
+Última actualización: 9 de Noviembre 2025
+Tipo: Mapa de Navegación Rápida
+Propósito: Encontrar lo que necesitas en 3 segundos
+
+╚════════════════════════════════════════════════════════════════════════════╝

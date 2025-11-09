@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             return; // No permitir movimiento durante dash
 
         float targetVelocityX = moveInput.x * moveSpeed;
-        rb.velocity = new Vector2(targetVelocityX, rb.velocity.y);
+        rb.linearVelocity = new Vector2(targetVelocityX, rb.linearVelocity.y);
 
         // Rotar sprite según dirección
         if (moveInput.x > 0 && !isFacingRight)
@@ -187,7 +187,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (!isGrounded)
             return;
 
-        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         
         EventManager.Broadcast(new PlayerJumpedEvent { jumpPosition = transform.position });
@@ -218,7 +218,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         float elapsedTime = 0f;
         while (elapsedTime < dashDuration)
         {
-            rb.velocity = dashVelocity;
+            rb.linearVelocity = dashVelocity;
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -300,7 +300,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void ApplyDrag()
     {
-        rb.drag = isGrounded ? groundDrag : airDrag;
+        rb.linearDamping = isGrounded ? groundDrag : airDrag;
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -321,7 +321,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         // Knockback
         if (knockbackForce > 0)
         {
-            rb.velocity = knockbackDirection.normalized * knockbackForce;
+            rb.linearVelocity = knockbackDirection.normalized * knockbackForce;
         }
 
         EventManager.Broadcast(new PlayerTakeDamageEvent 

@@ -1,0 +1,331 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   ✅ CHECKLIST DE VERIFICACIÓN                            ║
+║                                                                            ║
+║          Asegúrate que todo está correctamente configurado              ║
+║                                                                            ║
+║                        9 Nov 2025 - Version 2                           ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 PASO 1: ESTRUCTURA DE CARPETAS
+════════════════════════════════════════════════════════════════════════════════
+
+Verificar que tienes estas CARPETAS en Assets/Scripts/:
+
+  [ ] Core/
+      [ ] GameManager.cs
+      [ ] EventManager.cs
+      [ ] README.md (NUEVO)
+
+  [ ] Data/
+      [ ] GameSaveData.cs
+      [ ] README.md (NUEVO)
+
+  [ ] Utilities/
+      [ ] Events/
+          [ ] GameEvents.cs
+          [ ] EventManager.cs
+          [ ] README.md (NUEVO)
+      [ ] Interfaces/
+          [ ] IDamageable.cs
+          [ ] IEnemy.cs
+          [ ] IBoss.cs
+          [ ] README.md (NUEVO)
+
+  [ ] Entities/
+      [ ] Player/
+          [ ] PlayerController.cs
+      [ ] Enemy/
+      [ ] Boss/
+
+  [ ] Managers/
+      [ ] CameraManager.cs
+      [ ] README.md (NUEVO)
+
+  [ ] Level/
+  [ ] UI/
+  [ ] Prefabs/
+
+
+════════════════════════════════════════════════════════════════════════════════
+📋 PASO 2: ARCHIVOS C# PRINCIPALES
+════════════════════════════════════════════════════════════════════════════════
+
+Verificar que estos C# files existen Y no tienen errores:
+
+Core/:
+  [ ] GameManager.cs
+      Línea 1: ✅ using UnityEngine;
+      Línea ~20: ✅ public sealed class GameManager : MonoBehaviour
+      [ ] Compila sin errores
+
+  [ ] EventManager.cs
+      Línea 1: ✅ using UnityEngine;
+      Línea ~18: ✅ public class EventManager : MonoBehaviour
+      Línea ~19-20: ✅ public static EventManager Instance { get; private set; }
+      [ ] Compila sin errores
+
+Data/:
+  [ ] GameSaveData.cs
+      Línea 1: ✅ using System;
+      Línea 2: ✅ using System.Collections.Generic;
+      Línea ~4: ✅ [System.Serializable]
+      [ ] Compila sin errores
+
+Utilities/Events/:
+  [ ] GameEvents.cs
+      Línea ~1: ✅ public abstract class GameEvent { }
+      Línea ~10+: ✅ public class BossDefeatedEvent : GameEvent
+      [ ] Compila sin errores
+
+  [ ] EventManager.cs
+      Línea ~1: ✅ using System;
+      Línea ~18: ✅ public class EventManager : MonoBehaviour
+      [ ] Compila sin errores
+
+Utilities/Interfaces/:
+  [ ] IDamageable.cs
+      Línea ~3: ✅ public interface IDamageable
+      [ ] Compila sin errores
+
+  [ ] IEnemy.cs
+      Línea ~3: ✅ public interface IEnemy : IDamageable
+      [ ] Compila sin errores
+
+  [ ] IBoss.cs
+      Línea ~3: ✅ public interface IBoss : IDamageable
+      [ ] Compila sin errores
+
+Entities/Player/:
+  [ ] PlayerController.cs
+      Línea ~1: ✅ using UnityEngine.InputSystem;
+      Línea ~20: ✅ public class PlayerController : MonoBehaviour, IDamageable
+      [ ] Compila sin errores
+
+Managers/:
+  [ ] CameraManager.cs
+      Línea ~1: ✅ using UnityEngine;
+      Línea ~4: ✅ public class CameraManager : MonoBehaviour
+      [ ] Compila sin errores
+
+
+════════════════════════════════════════════════════════════════════════════════
+🎮 PASO 3: SETUP EN UNITY SCENE
+════════════════════════════════════════════════════════════════════════════════
+
+⚠️ IMPORTANTE: ESTO ES OBLIGATORIO PARA QUE FUNCIONE
+
+3.1 - CREAR GAMEMANAGER (NUEVO PASO):
+  [ ] En Scene, crea un GameObject vacío: "GameManager"
+  [ ] Adjunta script: Core/GameManager.cs
+  [ ] Verifica en Inspector:
+      [ ] Script está asignado
+      [ ] No tiene errores rojos en Inspector
+  [ ] Posición: (0, 0, 0)
+  [ ] Mark as: DontDestroyOnLoad
+
+3.2 - CREAR EVENTMANAGER (NUEVO PASO - CRÍTICO):
+  [ ] En Scene, crea un GameObject vacío: "EventManager"
+  [ ] Adjunta script: Core/EventManager.cs ⚠️ OBLIGATORIO
+  [ ] Verifica en Inspector:
+      [ ] Script está asignado
+      [ ] No tiene errores rojos en Inspector
+  [ ] Posición: (0, 0, 0)
+  [ ] Mark as: DontDestroyOnLoad
+
+3.3 - VERIFICAR PLAYER:
+  [ ] En Scene existe GameObject: "Player"
+  [ ] Tiene componente: PlayerController.cs
+  [ ] Tiene componente: Rigidbody2D
+  [ ] Tiene componente: Collider2D
+  [ ] Inspector sin errores rojos
+
+3.4 - VERIFICAR CAMERA:
+  [ ] En Scene existe: "Main Camera"
+  [ ] Tiene componente: CameraManager.cs
+  [ ] Inspector sin errores rojos
+
+3.5 - VERIFICAR OTROS:
+  [ ] Si tienes prefabs, están en Prefabs/ folder
+  [ ] Si tienes niveles, están organizados en Level/ folder
+
+
+════════════════════════════════════════════════════════════════════════════════
+⚙️ PASO 4: CONFIGURACIÓN DE COMPONENTS
+════════════════════════════════════════════════════════════════════════════════
+
+GameManager en Inspector:
+  [ ] MaxHealthUpgrades: 5
+  [ ] MaxWeaponUpgrades: 3
+  [ ] SavePath: (AUTO, no toques)
+  [ ] NO tiene red X errors
+
+EventManager en Inspector:
+  [ ] Solo tiene el Script asignado
+  [ ] NO tiene red X errors
+
+PlayerController en Inspector:
+  [ ] moveSpeed: ~8
+  [ ] acceleration: ~0.1
+  [ ] dashCooldown: ~0.3
+  [ ] dashDuration: ~0.15
+  [ ] NO tiene red X errors
+
+CameraManager en Inspector:
+  [ ] smoothSpeed: ~5
+  [ ] NO tiene red X errors
+
+
+════════════════════════════════════════════════════════════════════════════════
+🧪 PASO 5: VERIFICACIÓN DE COMPILACIÓN
+════════════════════════════════════════════════════════════════════════════════
+
+En Unity Console:
+
+  [ ] NO hay errores rojos (Errors: 0)
+  [ ] NO hay warnings amarillos relacionados a Scripts
+  [ ] Abre View → Compiler Settings
+      [ ] Warnings: 0 (o warnings de otros sistemas)
+
+
+════════════════════════════════════════════════════════════════════════════════
+▶️ PASO 6: PRUEBA INICIAL
+════════════════════════════════════════════════════════════════════════════════
+
+6.1 - Presiona PLAY en Unity
+
+6.2 - Verifica Console que aparezca:
+  [ ] "[GameManager] Inicializado | Ruta: ..."
+  [ ] "[GameManager] Nuevo juego creado"
+  [ ] "[EventManager] Inicializado" (NUEVO)
+
+6.3 - En Game View verifica:
+  [ ] Escena renderiza normalmente
+  [ ] NO hay excepciones rojas
+  [ ] NO ves error dialogs
+
+6.4 - Prueba controles:
+  [ ] WASD → player se mueve horizontalmente
+  [ ] ESPACIO → player salta
+  [ ] SHIFT → player hace dash (si está implementado)
+  [ ] E → player ataca (si está implementado)
+
+6.5 - Presiona STOP
+
+
+════════════════════════════════════════════════════════════════════════════════
+🔄 PASO 7: MIGRACIÓN (Si escribiste código ANTES)
+════════════════════════════════════════════════════════════════════════════════
+
+Si tienes scripts que escribiste ANTES del cambio:
+
+7.1 - Busca en tus scripts:
+  [ ] Ctrl+H (Find & Replace en tu editor)
+  [ ] Busca: "EventManager."
+  [ ] Verifica que encuentra resultados
+
+7.2 - Reemplaza TODOS:
+  [ ] EventManager.Subscribe → EventManager.Instance.Subscribe
+  [ ] EventManager.Unsubscribe → EventManager.Instance.Unsubscribe
+  [ ] EventManager.Broadcast → EventManager.Instance.Broadcast
+
+7.3 - Verifica que compila:
+  [ ] NO hay errores rojos
+  [ ] Presiona PLAY
+  [ ] Funciona sin excepciones
+
+
+════════════════════════════════════════════════════════════════════════════════
+📝 PASO 8: DOCUMENTACIÓN RECOMENDADA
+════════════════════════════════════════════════════════════════════════════════
+
+Después de verificar que compilar y corre, LEE (en este orden):
+
+  [ ] ESTADO_ACTUAL.txt (10 min) - Entiende cambios
+  [ ] CAMBIOS_DETECTADOS.txt (15 min) - Detalles técnicos
+  [ ] Core/README.md - Referencia GameManager
+  [ ] Utilities/README.md - Referencia EventManager
+  [ ] COMIENZA_AQUI.txt - Refactorización de scripts viejos
+
+
+════════════════════════════════════════════════════════════════════════════════
+🐛 PASO 9: TROUBLESHOOTING
+════════════════════════════════════════════════════════════════════════════════
+
+SI APARECE ERROR: "EventManager Instance is null"
+  [ ] Verificar que EventManager GameObject existe en Scene
+  [ ] Verificar que tiene script Core/EventManager.cs
+  [ ] Verificar que NO hay errores rojos en el Inspector
+  [ ] Presionar PLAY nuevamente
+
+SI APARECE ERROR: "GameManager Instance is null"
+  [ ] Verificar que GameManager GameObject existe en Scene
+  [ ] Verificar que tiene script Core/GameManager.cs
+  [ ] Verificar que NO hay errores rojos en el Inspector
+  [ ] Presionar PLAY nuevamente
+
+SI NO COMPILA:
+  [ ] Asegúrate que Core/, Data/, Utilities/ tienen .cs files
+  [ ] Revisa Console por errores específicos
+  [ ] Busca línea del error en el archivo
+  [ ] Si es sobre "EventManager", revisa CAMBIOS_DETECTADOS.txt
+
+SI NO PUEDO MOVER PLAYER:
+  [ ] Verificar PlayerController.cs tiene Update method
+  [ ] Verificar que Player GameObject tiene Rigidbody2D
+  [ ] Verificar que tienes InputSystem instalado
+  [ ] Buscar en Console por "InputSystem" errors
+
+SI LOS EVENTOS NO FUNCIONAN:
+  [ ] Verificar que usas EventManager.Instance.Subscribe (no EventManager.Subscribe)
+  [ ] Verificar que tu handler tiene tipo correcto: void Handler(BossDefeatedEvent evt)
+  [ ] Verificar que Unsubscribe se llama en OnDestroy
+  [ ] Revisar Console para mensajes del EventManager
+
+
+════════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST FINAL
+════════════════════════════════════════════════════════════════════════════════
+
+ANTES DE AVANZAR, VERIFICA:
+
+  [ ] Todos los .cs files existen en sus carpetas
+  [ ] Todos los .cs files compilan sin errores
+  [ ] GameManager GameObject en Scene con script
+  [ ] EventManager GameObject en Scene con script ⚠️ NUEVO PASO
+  [ ] Player GameObject con PlayerController
+  [ ] Main Camera con CameraManager
+  [ ] Presionaste PLAY y aparecen los mensajes de Log
+  [ ] Presionaste PLAY y funciona sin excepciones
+  [ ] Controles del player funcionan
+  [ ] Si tienes código anterior, migraste EventManager. → EventManager.Instance.
+
+SI TODAS TIENEN ✅:
+  ¡ENHORABUENA! Tu setup está correcto. Ahora puedes:
+    1. Leer documentación (ESTADO_ACTUAL.txt, CAMBIOS_DETECTADOS.txt)
+    2. Refactorizar scripts viejos (COMIENZA_AQUI.txt)
+    3. Agregar nuevos features
+
+
+════════════════════════════════════════════════════════════════════════════════
+📞 REFERENCIA RÁPIDA
+════════════════════════════════════════════════════════════════════════════════
+
+ARCHIVO PARA CONSULTAR          BÚSQUEDA/PREGUNTA
+─────────────────────────────────────────────────────
+Utilities/README.md             ¿Cómo uso EventManager?
+Core/README.md                  ¿Cómo uso GameManager?
+CAMBIOS_DETECTADOS.txt          ¿Qué cambió recientemente?
+ESTADO_ACTUAL.txt               ¿En qué punto estamos?
+QUICK_START.txt                 ¿Cómo configuro en Unity?
+COMIENZA_AQUI.txt               ¿Cómo refactorizo viejos scripts?
+ARQUITECTURA_BRUTAL.txt         ¿Cómo está diseñada la arch?
+
+
+════════════════════════════════════════════════════════════════════════════════
+
+Última revisión: 9 de Noviembre 2025
+Versión: 2.0 (Incluye cambio de EventManager a MonoBehaviour)
+
+╚════════════════════════════════════════════════════════════════════════════╝
