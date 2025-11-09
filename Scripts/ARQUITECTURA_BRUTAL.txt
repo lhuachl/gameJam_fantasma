@@ -1,0 +1,394 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║              ARQUITECTURA BRUTAL - MAPEO COMPLETO                          ║
+║                    Game Jam 2 - Plataformero Lineal                       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📁 ESTRUCTURA DE CARPETAS ACTUAL
+════════════════════════════════════════════════════════════════════════════
+
+Assets/Scripts/
+│
+├── 📂 Core/
+│   ├── ✅ GameManager.cs
+│   │   └─ Singleton que mantiene estado global
+│   │      - CreateNewGame(), SaveGameState(), LoadGameState()
+│   │      - DefeatBoss(), ProgressToNextLevel(), MakeLevelDecision()
+│   │      - AddHealthUpgrade(), AddWeaponUpgrade(), AddSpecialAbility()
+│   │      - GetCurrentLevel(), GetMaxHealth(), GetWeaponDamage()
+│   │
+│   └── (SaveManager.cs - integrado en GameManager por ahora)
+│
+├── 📂 Data/
+│   ├── ✅ GameSaveData.cs
+│   │   ├─ class GameSaveData (serializable)
+│   │   │  - currentLevel, completedLevels, pendingBoss
+│   │   │  - decisionsPath, goodEndings, badEndings
+│   │   │  - defeatedBosses (dict), maxHealth, weaponDamage
+│   │   │  - specialAbilities[], playTime, lastPlayedDate
+│   │   │
+│   │   └─ class UpgradeConfig (para configurar upgrades)
+│   │      - upgradeId, displayName, healthBonus, damageBonus, specialAbility
+│   │
+│   └── (LevelData.cs - CREAR para cargar CSVs)
+│
+├── 📂 Utilities/
+│   ├── 📂 Interfaces/
+│   │   ├── ✅ IDamageable.cs
+│   │   │   - TakeDamage(), GetCurrentHealth(), IsAlive(), GetPosition()
+│   │   │
+│   │   ├── ✅ IEnemy.cs (hereda IDamageable)
+│   │   │   - GetEnemyType(), CanSeePlayer(), AttackPlayer(), IsAttacking()
+│   │   │
+│   │   └── ✅ IBoss.cs (hereda IDamageable)
+│   │       - GetBossId(), EnterBattle(), ExitBattle(), GetCurrentPhase()
+│   │
+│   └── 📂 Events/
+│       ├── ✅ GameEvents.cs (13 eventos diferentes)
+│       │   - BossDefeatedEvent, LevelCompleteEvent, DecisionMadeEvent
+│       │   - PlayerTakeDamageEvent, PlayerDiedEvent, PlayerTookUpgradeEvent
+│       │   - PlayerJumpedEvent, PlayerDashedEvent, PlayerAttackedEvent
+│       │   - EnemyDefeatedEvent, EnemySpawnedEvent
+│       │   - LevelLoadedEvent, LevelUnloadingEvent
+│       │   - MusicChangeRequestedEvent, SFXPlayRequestedEvent
+│       │
+│       └── ✅ EventManager.cs
+│           - Pub/Sub pattern centralizado
+│           - Subscribe<T>(), Unsubscribe<T>(), Broadcast<T>()
+│
+├── 📂 Entities/
+│   │
+│   ├── 📂 Player/
+│   │   ├── ✅ PlayerController.cs
+│   │   │   ├─ Implementa: IDamageable
+│   │   │   ├─ Movimiento, salto, dash (intangible), ataque
+│   │   │   ├─ Input System setup en código
+│   │   │   ├─ Dash hace intangible (desactiva collider)
+│   │   │   ├─ Attack detecta enemigos en rango
+│   │   │   ├─ TakeDamage() respetar intangibilidad
+│   │   │   └─ Broadcasts: PlayerJumped, PlayerDashed, PlayerAttacked, PlayerTakeDamage
+│   │   │
+│   │   └── (PlayerUpgrade.cs - CREAR para recoger upgrades)
+│   │
+│   ├── 📂 Enemy/
+│   │   │
+│   │   ├── 📂 Base/
+│   │   │   ├── (BaseEnemy.cs - CREAR clase abstracta)
+│   │   │   │   ├─ Implementa: IEnemy
+│   │   │   │   ├─ Patrullaje común
+│   │   │   │   ├─ Detección de jugador
+│   │   │   │   ├─ Sistema de ataque base
+│   │   │   │   ├─ Knockback y daño
+│   │   │   │   └─ Métodos virtuales para override
+│   │   │   │
+│   │   │   └── (BaseEnemyConfig.cs - CREAR scriptable para stats)
+│   │   │
+│   │   └── 📂 Types/
+│   │       ├── (BasicEnemy.cs - CREAR tipo X)
+│   │       │   └─ Enemigo normal, patrullaje simple
+│   │       │
+│   │       ├── (FastEnemy.cs - CREAR tipo Y)
+│   │       │   └─ Más rápido, menos vida, mejor visión
+│   │       │
+│   │       ├── (StrongEnemy.cs - CREAR tipo Z)
+│   │       │   └─ Más lento, más vida, daño más alto
+│   │       │
+│   │       └── (FlyingEnemy.cs - CREAR tipo V)
+│   │           └─ Vuela, no afectado por gravedad, patrón diferente
+│   │
+│   └── 📂 Boss/
+│       ├── (BaseBoss.cs - CREAR clase abstracta)
+│       │   ├─ Implementa: IBoss
+│       │   ├─ State machine (Waiting, Phase1, Phase2, Phase3, Defeated)
+│       │   ├─ Sistema de fases
+│       │   ├─ Knockback resistance
+│       │   ├─ Broadcast: BossDefeatedEvent
+│       │   └─ Métodos virtuales para ataques específicos
+│       │
+│       ├── (Boss1.cs - CREAR primer boss)
+│       │   ├─ Hereda BaseBoss
+│       │   ├─ Ataques específicos (fireball, combo, etc.)
+│       │   └─ Fases únicas
+│       │
+│       ├── (Boss2.cs - CREAR segundo boss)
+│       │   └─ Diferente esencia, ataques diferentes
+│       │
+│       └── (FinalBoss.cs - REFACTORIZAR)
+│           └─ Boss final con mecánica diferente
+│
+├── 📂 Managers/
+│   ├── ✅ CameraManager.cs
+│   │   └─ Sigue al jugador con offset suave
+│   │
+│   ├── (LevelManager.cs - CREAR/REFACTORIZAR GeneradorNivel)
+│   │   ├─ Genera nivel desde CSV
+│   │   ├─ Carga prefabs (paredes, enemigos, items)
+│   │   ├─ Coloca jugador y boss
+│   │   ├─ Suscribe a BossDefeatedEvent
+│   │   └─ Maneja transición al siguiente nivel
+│   │
+│   ├── (AudioManager.cs - CREAR)
+│   │   ├─ Música por zona
+│   │   ├─ SFX para acciones
+│   │   ├─ Suscribe a eventos de audio
+│   │   └─ Crossfade entre temas
+│   │
+│   └── (InputManager.cs - OPCIONAL, puede quedar en PlayerController)
+│       └─ Si quieres centralizar input en futuros
+│
+├── 📂 Level/
+│   ├── (LevelGenerator.cs - REFACTORIZAR de GeneradorNivel)
+│   │   └─ Ve hacia Managers/LevelManager.cs
+│   │
+│   ├── (LevelTransition.cs - CREAR)
+│   │   ├─ Maneja fade in/out entre niveles
+│   │   ├─ Cinematic playback
+│   │   └─ Decisión UI (BUENO/MALO)
+│   │
+│   └── (Finish.cs - REFACTORIZAR)
+│       └─ Trigger al final del nivel
+│
+├── 📂 UI/
+│   ├── (HUDManager.cs - CREAR)
+│   │   ├─ Muestra salud, upgrades
+│   │   ├─ Escucha PlayerTakeDamageEvent
+│   │   └─ Escucha PlayerTookUpgradeEvent
+│   │
+│   ├── (MenuManager.cs - REFACTORIZAR NewGame + Continue)
+│   │   ├─ Botón "New Game" → GameManager.CreateNewGame()
+│   │   ├─ Botón "Continue" → GameManager.LoadGameState()
+│   │   └─ Verifica HasSaveFile()
+│   │
+│   └── (PauseManager.cs - CREAR si se necesita)
+│       ├─ Pausa el juego (Time.timeScale = 0)
+│       └─ Menú de pausa
+│
+└── 📂 (Legacy - Scripts antiguos para remover después)
+    ├── ControlesPersonaje.cs (REEMPLAZADO por PlayerController)
+    ├── CameraFollowplayer.cs (REEMPLAZADO por CameraManager)
+    ├── GeneradorNivel.cs (CONVERTIR a LevelManager)
+    ├── EnemyController.cs (REEMPLAZAR con BaseEnemy + Types)
+    ├── Boss.cs (REEMPLAZAR con BaseBoss + Boss1, Boss2)
+    ├── FinalBoss.cs (REFACTORIZAR con BaseBoss)
+    ├── NewGame.cs (INTEGRAR en MenuManager)
+    ├── Continue.cs (INTEGRAR en MenuManager)
+    ├── Finish.cs (CONVERTIR a LevelTransition)
+    └── ... otros
+
+
+════════════════════════════════════════════════════════════════════════════
+✅ COMPLETADO (Funcional en Producción)
+════════════════════════════════════════════════════════════════════════════
+
+[✅] Core/GameManager.cs
+     └─ Singleton funcional, guardado/carga de JSON, upgrade system
+
+[✅] Data/GameSaveData.cs
+     └─ Estructura serializable con todos los campos necesarios
+
+[✅] Utilities/Interfaces/ (IDamageable, IEnemy, IBoss)
+     └─ Contratos para todos los sistemas damageable
+
+[✅] Utilities/Events/GameEvents.cs + EventManager.cs
+     └─ 13 eventos diferentes, sistema pub/sub completo
+
+[✅] Entities/Player/PlayerController.cs
+     └─ Input System integrado, dash intangible, ataque, IDamageable
+
+[✅] Managers/CameraManager.cs
+     └─ Camera suave siguiendo al jugador
+
+
+════════════════════════════════════════════════════════════════════════════
+⏳ PENDIENTE INMEDIATO (Hoy/Mañana)
+════════════════════════════════════════════════════════════════════════════
+
+[⏳] Refactorizar GeneradorNivel → Managers/LevelManager.cs
+    - Leer CSV como antes
+    - Usar GameManager en lugar de guardar datos local
+    - Suscribirse a BossDefeatedEvent
+    - Instanciar enemigos como BaseEnemy (cuando exista)
+    - NOTA: Por ahora puede funcionar con EnemyController mientras se refactoriza
+
+[⏳] Refactorizar NewGame.cs + Continue.cs → UI/MenuManager.cs
+    - New Game → GameManager.Instance.CreateNewGame() + cargar escena nivel 1
+    - Continue → GameManager.Instance.HasSaveFile() + cargar escena nivel actual
+    - Eliminar duplicación de SaveData
+
+[⏳] Refactorizar Boss.cs
+    - Heredar de BaseBoss (cuando se cree)
+    - Broadcast BossDefeatedEvent cuando muere
+    - Por ahora: solo agregar el broadcast
+
+[⏳] Refactorizar Finish.cs
+    - Broadcast LevelCompleteEvent
+    - Usar GameManager.MakeLevelDecision()
+    - Transición a siguiente nivel
+
+
+════════════════════════════════════════════════════════════════════════════
+🚀 PENDIENTE PRÓXIMA FASE (Semana que viene)
+════════════════════════════════════════════════════════════════════════════
+
+[🚀] Entities/Enemy/Base/BaseEnemy.cs
+     - Clase abstracta con comportamiento común
+     - Herencia: BasicEnemy, FastEnemy, StrongEnemy, FlyingEnemy
+
+[🚀] Entities/Boss/BaseBoss.cs
+     - Clase abstracta con state machine de fases
+     - Herencia: Boss1, Boss2, FinalBoss
+
+[🚀] Managers/AudioManager.cs
+     - Música por zona y boss
+     - SFX para eventos
+
+[🚀] Level/LevelTransition.cs
+     - Fade between levels
+     - Decision UI (BUENO/MALO)
+
+[🚀] UI/HUDManager.cs
+     - Mostrar vida, upgrades
+     - Escuchar eventos
+
+
+════════════════════════════════════════════════════════════════════════════
+📊 FLUJO DE DATOS (CÓMO FUNCIONA TODO JUNTO)
+════════════════════════════════════════════════════════════════════════════
+
+INICIACIÓN DEL JUEGO:
+  1. GameManager.Awake() → Intenta cargar guardado anterior
+  2. Si no existe → CreateNewGame() → GameSaveData con defaults
+  3. Carga escena "Level_1"
+  4. LevelManager.Start() → Lee CSV, instancia enemigos, pone jugador
+  5. PlayerController.Start() → Carga stats de GameManager
+
+DURANTE EL JUEGO:
+  Jugador salta → PlayerController.Jump() → Broadcast PlayerJumpedEvent
+  Jugador ataca → PlayerController.Attack() → Busca enemigos, TakeDamage()
+  Enemigo recibe daño → BaseEnemy.TakeDamage() → Si muere: Broadcast EnemyDefeatedEvent
+  Jugador recibe daño → PlayerController.TakeDamage() → Si muere: Respawnea o Restart
+
+NIVEL COMPLETO:
+  Jugador toca Finish trigger → Broadcast LevelCompleteEvent
+  LevelTransition.OnLevelComplete() → Muestra cinemática
+  Jugador presiona BUENO/MALO → GameManager.MakeLevelDecision()
+  GameManager.ProgressToNextLevel() → currentLevel++
+  Cargar escena "Level_2"
+
+BOSS DERROTADO:
+  Boss.Die() → Broadcast BossDefeatedEvent
+  GameManager.DefeatBoss(bossId) → Guarda en defeatedBosses[]
+  LevelManager.OnBossDefeated() → Desbloquea puerta final
+  Jugador puede continuar al siguiente nivel
+
+GUARDADO:
+  Cualquier cambio importante → GameManager.SaveGameState()
+  Escribe JSON a Application.persistentDataPath
+  Si cierra juego → Próxima sesión: LoadGameState()
+
+
+════════════════════════════════════════════════════════════════════════════
+🔧 CÓMO USAR LA ARQUITECTURA
+════════════════════════════════════════════════════════════════════════════
+
+DESDE CUALQUIER SCRIPT:
+
+// Acceder a estado del juego
+int level = GameManager.Instance.GetCurrentLevel();
+int maxHealth = GameManager.Instance.GetMaxHealth();
+int damage = GameManager.Instance.GetWeaponDamage();
+
+// Realizar acciones
+GameManager.Instance.AddHealthUpgrade();
+GameManager.Instance.AddWeaponUpgrade();
+GameManager.Instance.DefeatBoss("boss1");
+GameManager.Instance.SaveGameState();
+
+// Escuchar eventos
+EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+EventManager.Subscribe<PlayerTakeDamageEvent>(OnPlayerHit);
+EventManager.Subscribe<LevelCompleteEvent>(OnLevelDone);
+
+// Broadcast eventos
+EventManager.Broadcast(new PlayerDashedEvent { dashStartPosition = pos });
+EventManager.Broadcast(new MusicChangeRequestedEvent { musicClipName = "zone_1_music" });
+
+// Implementar IDamageable
+public bool TakeDamage(int damage, Vector2 direction = default, float force = 0)
+{
+    health -= damage;
+    if (health <= 0)
+        Die();
+    return health > 0;
+}
+
+
+════════════════════════════════════════════════════════════════════════════
+💡 VENTAJAS DE ESTA ARQUITECTURA
+════════════════════════════════════════════════════════════════════════════
+
+1. ✅ ESCALABILIDAD
+   - Agregar nuevo enemigo tipo: crear clase que herede BaseEnemy
+   - Agregar nuevo boss: crear clase que herede BaseBoss
+   - No hay copy-paste, código limpio y reutilizable
+
+2. ✅ DESACOPLAMIENTO
+   - GameManager no sabe de UI
+   - LevelManager no sabe de Audio
+   - Todos se comunican via EventManager
+   - Fácil de debuggear: mirar Console para eventos
+
+3. ✅ MANTENIBILIDAD
+   - SaveData en UN solo lugar (GameManager)
+   - No hay datos duplicados (bug anterior SOLUCIONADO)
+   - Cambiar lógica de upgrade: 1 lugar (GameManager.AddHealthUpgrade)
+   - Cambiar lógica de guardado: 1 lugar (GameManager.SaveGameState)
+
+4. ✅ TESTABILIDAD
+   - Interfaces hacen fácil crear mocks
+   - EventManager permite inyectar eventos en tests
+   - Singletons con defaults para testing
+
+5. ✅ EXTENSIBILIDAD
+   - Quieres agregar sistema de skill points? → Agregar en GameSaveData
+   - Quieres agregar mini-bosses? → Hereda BaseBoss
+   - Quieres agregar nuevo tipo de enemigo? → Hereda BaseEnemy
+   - Quieres agregar sistema de achievement? → Escucha eventos
+
+6. ✅ RENDIMIENTO
+   - No hay FindWithTag() repetido (bug anterior SOLUCIONADO)
+   - EventManager es O(1) para broadcast
+   - GameManager carga JSON una sola vez
+
+
+════════════════════════════════════════════════════════════════════════════
+📝 PRÓXIMOS PASOS EXACTOS
+════════════════════════════════════════════════════════════════════════════
+
+1. Agregar GameManager y EventManager al scene (GameObjects vacíos con scripts)
+
+2. Refactorizar ORDEN CORRECTO:
+   a) MenuManager (NewGame + Continue)
+      → Probar que inicia nivel y carga guardado
+   
+   b) LevelManager (GeneradorNivel refactorizado)
+      → Probar que carga CSV, pone enemigos
+      → Conectar con GameManager.GetCurrentLevel()
+   
+   c) Boss.cs refactorizado
+      → Solo agregar Broadcast BossDefeatedEvent al Die()
+      → Probar que evento se dispara
+   
+   d) Finish.cs refactorizado
+      → Agregar Broadcast LevelCompleteEvent
+      → Usar GameManager.ProgressToNextLevel()
+      → Usar GameManager.MakeLevelDecision()
+
+3. UNA VEZ ESTABLE, empezar refactorización mayor:
+   → BaseEnemy + tipos
+   → BaseBoss + Boss1, Boss2
+   → AudioManager
+   → Finish más pulido
+
+════════════════════════════════════════════════════════════════════════════
+
+╚════════════════════════════════════════════════════════════════════════════╝

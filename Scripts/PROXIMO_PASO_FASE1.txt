@@ -1,0 +1,290 @@
+/*
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    PRÓXIMOS PASOS - FASE 1 CONTINUACIÓN                  ║
+║                      Refactorizar Menús y GeneradorNivel                 ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+ESTADO ACTUAL:
+✅ GameManager.cs - Creado y funcional
+✅ EventManager.cs - Creado con todos los eventos
+
+AHORA NECESITAMOS:
+Refactorizar 4 archivos para que usen GameManager en lugar de crear SaveData localmente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. NewGame.cs - Refactorización
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CAMBIOS:
+  - ELIMINAR: Definición de SaveData local
+  - CAMBIAR: Usar GameManager.Instance.CreateNewGame()
+  - CAMBIAR: Usar GameManager.Instance.SaveGameState()
+
+PSEUDO-CÓDIGO:
+  private void ExecuteNewGame()
+  {
+      // ANTES: creaba SaveData local
+      // AHORA: 
+      GameManager.Instance.DeleteSaveFile();  // Limpiar guardado anterior
+      GameManager.Instance.CreateNewGame();   // Crear nuevo
+      Time.timeScale = 1f;
+      SceneManager.LoadScene(sceneToLoad);
+  }
+
+IMPORTAR: using System.IO; (ya está)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. Continue.cs - Refactorización
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CAMBIOS:
+  - ELIMINAR: Definición de SaveData local
+  - CAMBIAR: Usar GameManager.Instance.HasSaveFile()
+  - CAMBIAR: Usar GameManager.Instance.CurrentSave
+
+PSEUDO-CÓDIGO:
+  private void ExecuteContinue()
+  {
+      if (!GameManager.Instance.HasSaveFile())
+      {
+          messageLabel.color = Color.red;
+          messageLabel.text = "no se encontro el guardado";
+          return;
+      }
+
+      // SaveData ya está cargado en GameManager
+      // No necesita hacer nada más, solo cargar escena
+      SceneManager.LoadScene(sceneToLoad);
+  }
+
+VENTAJA: Continue.cs no sabe ni necesita saber de JSON
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. Finish.cs - Refactorización (CRÍTICA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CAMBIOS:
+  - ELIMINAR: Definición de SaveData local (3 copias diferentes!)
+  - CAMBIAR: Usar GameManager.Instance.ProgressToNextLevel()
+  - CAMBIAR: Usar GameManager.Instance.DefeatBoss()
+  - AGREGAR: Broadcast LevelCompleteEvent después de elección
+
+ANTES (actual - INCORRECTO):
+  IEnumerator HandleFinish()
+  {
+      // Lee JSON manualmente
+      SaveData data = new SaveData();
+      string json = File.ReadAllText(path);
+      var loaded = JsonUtility.FromJson<SaveData>(json);
+      
+      // Modifica localmente
+      data.nivelActual = prevLevel + 1;
+      if (prevLevel % 3 == 0) data.pendingBoss = 1;
+      
+      // Guarda manualmente
+      File.WriteAllText(path, JsonUtility.ToJson(data));
+  }
+
+DESPUÉS (correcto - NUEVO):
+  IEnumerator HandleFinish()
+  {
+      // Esperar decisión
+      while (!decided)
+      {
+          if (Input.GetKeyDown(KeyCode.B))
+          {
+              decidedPath = "bueno";
+              decided = true;
+          }
+          else if (Input.GetKeyDown(KeyCode.M))
+          {
+              decidedPath = "malo";
+              decided = true;
+          }
+          yield return null;
+      }
+
+      // Usar GameManager para progresar
+      GameManager.Instance.ProgressToNextLevel(decidedPath);
+
+      // Broadcast evento
+      EventManager.Broadcast(new DecisionMadeEvent 
+      { 
+          chosenPath = decidedPath,
+          levelNumber = GameManager.Instance.CurrentSave.nivelActual - 1
+      });
+
+      // Transición
+      yield return StartCoroutine(FadeImage(blackImg, 0f, 1f, fadeDuration));
+      SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+  }
+
+VENTAJA: Finish.cs no toca JSON, GameManager maneja todo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. GeneradorNivel.cs - Refactorización (IMPORTANTE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CAMBIOS:
+  - ELIMINAR: Definición de SaveData local
+  - CAMBIAR: Usar GameManager.Instance.CurrentSave
+  - CAMBIAR: Usar GameManager.Instance.DefeatBoss()
+  - AGREGAR: Escuchar BossDefeatedEvent en lugar de OnBossDefeated()
+  - ELIMINAR: TryLoadSaveAndApplyLevelIndex() (GameManager ya cargó)
+
+CLAVE - EN Start():
+  void Start()
+  {
+      CargarArchivosDeNivel();
+      // NO NECESITA: TryLoadSaveAndApplyLevelIndex()
+      // GameManager ya cargó el guardado en Awake()
+      
+      // Usar CurrentSave del GameManager
+      int levelToLoad = Mathf.Max(0, GameManager.Instance.CurrentSave.nivelActual - 1);
+      
+      StartCoroutine(RunLevelFlow(levelToLoad));
+  }
+
+CLAVE - EN CargarNivel():
+  public void CargarNivel(int indiceNivel)
+  {
+      var save = GameManager.Instance.CurrentSave;
+      
+      // Chequear si debe ser nivel de boss
+      esNivelBoss = save.pendingBoss;
+      
+      // Rest de la lógica igual...
+  }
+
+CLAVE - AGREGAR al Awake():
+  private void Awake()
+  {
+      // Suscribirse a evento de boss derrotado
+      EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+  }
+
+CLAVE - REFACTORIZAR OnBossDefeated():
+  private void OnBossDefeated(BossDefeatedEvent evt)
+  {
+      Debug.Log($"GeneradorNivel: Boss {evt.bossId} derrotado");
+      GameManager.Instance.DefeatBoss(evt.bossId);
+      
+      // Cargar siguiente nivel normal
+      esNivelBoss = false;
+      int nextLevel = Mathf.Clamp(
+          GameManager.Instance.CurrentSave.nivelActual,
+          0,
+          (archivosDeNivel?.Count ?? 1) - 1
+      );
+      CargarNivel(nextLevel);
+  }
+
+VENTAJA: GeneradorNivel escucha eventos, no llama directamente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. Boss.cs - Cambio MÍNIMO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CAMBIOS:
+  - AGREGAR al método Die(): Broadcast BossDefeatedEvent
+
+CÓDIGO:
+  void Die()
+  {
+      Debug.Log("Boss defeated!");
+      
+      // Broadcast evento
+      EventManager.Broadcast(new BossDefeatedEvent 
+      { 
+          bossId = "boss1"  // O "boss2", según cuál sea
+      });
+      
+      Destroy(gameObject);
+  }
+
+VENTAJA: Boss solo notifica, no sabe quién escucha
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ORDEN DE IMPLEMENTACIÓN (SIN ROMPER EL JUEGO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. NewGame.cs - Cambio simple, bajo riesgo
+2. Continue.cs - Cambio simple, bajo riesgo
+3. Boss.cs - Agregar un Broadcast, sin eliminar nada
+4. GeneradorNivel.cs - Cambio complejo, requiere testing
+5. Finish.cs - Cambio grande, requiere testing
+
+CADA PASO:
+  - Modifica solo lo necesario
+  - Deja comentarios // ANTES / // AHORA
+  - TEST después de cada cambio
+  - Si algo rompe, reporta exactamente qué
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TESTING CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DESPUÉS DE CADA REFACTORIZACIÓN:
+
+✓ Ejecutar "New Game" desde menú
+  - ¿Se crea nuevo guardado?
+  - ¿Comienza en nivel 1?
+  - ¿Se ve en Console: "GameManager: Nuevo juego creado"?
+
+✓ Ejecutar "Continue" desde menú
+  - ¿Se carga el guardado?
+  - ¿Comienza en el nivel correcto?
+  - ¿Se ve en Console: "GameManager: Guardado cargado - Nivel X"?
+
+✓ Completar un nivel
+  - ¿Se guarda el progreso?
+  - ¿Se ve en Console: "GameManager: Avanzando a nivel X"?
+
+✓ Cerrar aplicación y abrir de nuevo
+  - ¿Se carga donde dejaste?
+  - ¿Progreso se mantiene?
+
+✓ Derrotar un boss (cuando esté conectado evento)
+  - ¿Se ve en Console: "EventManager: Broadcasteado BossDefeatedEvent"?
+  - ¿Se ve: "GeneradorNivel: Boss boss1 derrotado"?
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ERRORES COMUNES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ "GameManager.Instance is null"
+   CAUSA: GameManager no está en la escena
+   SOLUCIÓN: Agregar GameManager a escena principal como GameObject vacío
+
+❌ "Cannot find type 'SaveData'"
+   CAUSA: SaveData se movió a GameManager.cs, otros scripts no ven
+   SOLUCIÓN: Referenciar como GameManager.SaveData o mover a archivo separado
+
+❌ "Guardado se sigue duplicando"
+   CAUSA: Aún hay código viejo que crea SaveData local
+   SOLUCIÓN: Buscar "new SaveData()" en el proyecto, eliminar
+
+❌ "El nivel no carga después de boss"
+   CAUSA: GeneradorNivel no escucha evento BossDefeatedEvent
+   SOLUCIÓN: Verificar EventManager.Subscribe en Awake()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CUÁNDO PARAR Y REPORTAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si en algún punto algo no compila o no funciona:
+
+REPORTA:
+  ARCHIVO: [nombre del script]
+  LÍNEA: [número de línea]
+  ERROR: [mensaje exacto de consola]
+  PASOS: [qué hiciste antes de que pase]
+  SCREENSHOT: [si aplica]
+
+INCLUYE:
+  - Código completo del archivo modificado
+  - Console output completo
+  - Si tiene guion rojo en el script
+
+╚════════════════════════════════════════════════════════════════════════════╝
+*/

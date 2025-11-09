@@ -1,0 +1,298 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                      QUICK START - 30 MINUTOS                             ║
+║                   (De "scripts rotos" a "funcional")                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+PASO 1: ENTENDER LO QUE PASÓ (5 minutos)
+════════════════════════════════════════════════════════════════════════════
+
+Tenías:
+  - Scripts desorganizados en la raíz
+  - SaveData duplicada en 4 archivos → Datos se perdían
+  - Sin sistema de eventos
+  - Código copy-paste
+
+Ahora tienes:
+  ✅ Arquitectura profesional en carpetas
+  ✅ SaveData en UN lugar (GameManager)
+  ✅ Sistema de eventos centralizado (EventManager)
+  ✅ Código limpio, sin duplicación
+  ✅ Fácil de escalar y mantener
+
+
+PASO 2: AGREGAR A TU ESCENA (10 minutos)
+════════════════════════════════════════════════════════════════════════════
+
+EN UNITY:
+
+1. Abre tu escena principal (ej: MenuScene o StartScene)
+
+2. Click derecho en Hierarchy → Create Empty
+   └─ Nombra: "GameManager"
+   └─ Adjunta script: Core/GameManager.cs
+   └─ Verifica Debug Mode = true
+
+3. Click derecho en Hierarchy → Create Empty
+   └─ Nombra: "EventManager"
+   └─ (No necesita script, EventManager es estático)
+
+4. Busca tu GameObject Player
+   └─ REEMPLAZA: ControlesPersonaje.cs
+   └─ AGREGA: Entities/Player/PlayerController.cs
+   └─ Configura:
+      - Ground Layer = "Ground" (como estaba)
+      - Ground Check = Tu transform de ground check (como estaba)
+      - Death Y Threshold = -20 (como estaba)
+
+5. Busca tu GameObject Camera
+   └─ REEMPLAZA: CameraFollowplayer.cs
+   └─ AGREGA: Managers/CameraManager.cs
+   └─ Configura:
+      - Target = Player (asigna)
+      - Offset = Vector3(0, 1, -10)
+      - Smooth Speed = 0.1
+
+6. GUARDA LA ESCENA
+
+7. PRESIONA PLAY
+   └─ En Console deberías ver:
+      "[GameManager] Inicializado | Ruta: ..."
+      "[GameManager] Nuevo juego creado"
+
+✅ SI VES ESO, PASO 2 COMPLETADO
+
+
+PASO 3: VERIFICAR FUNCIONA (5 minutos)
+════════════════════════════════════════════════════════════════════════════
+
+EN EL JUEGO:
+  [ ] Jugador se mueve (WASD o flechas)
+  [ ] Jugador salta (Space)
+  [ ] Jugador dasha (Y)
+  [ ] Jugador ataca (P)
+  [ ] Cámara sigue suavemente
+  [ ] No hay errores en Console
+
+EN CONSOLE:
+  Busca que se ven eventos (opcional):
+  "[EventManager] Subscrito a ..."
+  "[PlayerController] ..."
+
+✅ SI TODO ANDA, PASO 3 COMPLETADO
+
+
+PASO 4: PRÓXIMOS PASOS (10 minutos de lectura)
+════════════════════════════════════════════════════════════════════════════
+
+AHORA NECESITAS REFACTORIZAR ESTOS ARCHIVOS (HACERLO HOY):
+
+1️⃣ MenuManager (consolidar NewGame + Continue)
+   Ubicación: Assets/Scripts/UI/MenuManager.cs (CREAR)
+   
+   Código mínimo:
+   ┌──────────────────────────────────────────────┐
+   │ public class MenuManager : MonoBehaviour    │
+   │ {                                            │
+   │     public void OnNewGameClicked()            │
+   │     {                                        │
+   │         GameManager.Instance.CreateNewGame();│
+   │         SceneManager.LoadScene("Level_1");   │
+   │     }                                        │
+   │                                              │
+   │     public void OnContinueClicked()           │
+   │     {                                        │
+   │         if (GameManager.Instance             │
+   │             .HasSaveFile())                 │
+   │         {                                   │
+   │             int level = GameManager.Instance │
+   │                 .GetCurrentLevel();         │
+   │             string scene = $"Level_{level}";│
+   │             SceneManager.LoadScene(scene);  │
+   │         }                                   │
+   │     }                                        │
+   │ }                                            │
+   └──────────────────────────────────────────────┘
+
+2️⃣ Refactorizar GeneradorNivel.cs → LevelManager.cs
+   Ubicación: Assets/Scripts/Managers/LevelManager.cs (REFACTORIZAR)
+   
+   Cambios mínimos:
+   - Reemplazar todas las referencias a SaveData local
+   - Usar: int level = GameManager.Instance.GetCurrentLevel()
+   - Agregar subscribe: EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated)
+
+3️⃣ Refactorizar Boss.cs (agregar 1 línea)
+   
+   En la función Die():
+   ┌────────────────────────────────────────────┐
+   │ public void Die()                          │
+   │ {                                          │
+   │     // Lógica existente                    │
+   │     Destroy(gameObject);                   │
+   │                                            │
+   │     // AGREGAR ESTO:                       │
+   │     EventManager.Broadcast(                │
+   │       new BossDefeatedEvent                │
+   │       {                                    │
+   │           bossId = "boss1",               │
+   │           levelNumber = GameManager        │
+   │               .Instance.GetCurrentLevel()  │
+   │       });                                  │
+   │ }                                          │
+   └────────────────────────────────────────────┘
+
+4️⃣ Refactorizar Finish.cs (refactorizar)
+   
+   En OnTriggerEnter2D:
+   ┌─────────────────────────────────────────────┐
+   │ private void OnTriggerEnter2D(Collider2D col)
+   │ {                                           │
+   │     if (col.CompareTag("Player"))           │
+   │     {                                       │
+   │         // Broadcast evento                │
+   │         EventManager.Broadcast(             │
+   │           new LevelCompleteEvent           │
+   │           {                                │
+   │               levelNumber = GameManager    │
+   │                   .Instance.GetCurrentLevel()
+   │           });                              │
+   │                                            │
+   │         // Mostrar UI decisión             │
+   │         // (mantener lógica existente)     │
+   │     }                                       │
+   │ }                                           │
+   │                                            │
+   │ public void OnGoodDecision()                │
+   │ {                                          │
+   │     GameManager.Instance                   │
+   │         .MakeLevelDecision("good");        │
+   │     // Cargar siguiente nivel              │
+   │ }                                          │
+   │                                            │
+   │ public void OnBadDecision()                 │
+   │ {                                          │
+   │     GameManager.Instance                   │
+   │         .MakeLevelDecision("bad");         │
+   │     // Cargar siguiente nivel              │
+   │ }                                          │
+   └─────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST FINAL
+════════════════════════════════════════════════════════════════════════════
+
+[ ] Leí QUICK_START.txt (este archivo)
+[ ] GameManager agregado a escena
+[ ] EventManager agregado a escena
+[ ] PlayerController reemplaza ControlesPersonaje
+[ ] CameraManager reemplaza CameraFollowplayer
+[ ] Juego compila sin errores
+[ ] Console muestra "[GameManager] Inicializado"
+[ ] Jugador se mueve, salta, dasha, ataca
+[ ] Cámara sigue suavemente
+
+SIGUIENTE CHECKLIST (REFACTORIZACIÓN):
+
+[ ] MenuManager.cs creado
+[ ] NewGame y Continue funcionan
+[ ] LevelManager.cs refactorizado
+[ ] Boss.cs broadcast BossDefeatedEvent
+[ ] Finish.cs broadcast LevelCompleteEvent
+[ ] Juego es jugable de inicio a fin
+
+
+════════════════════════════════════════════════════════════════════════════
+🆘 SI ALGO SALE MAL
+════════════════════════════════════════════════════════════════════════════
+
+ERROR: "GameManager.Instance es null"
+→ Verifica que creaste GameObject "GameManager" con script GameManager.cs
+
+ERROR: "EventManager no se encuentra"
+→ No necesita GameObject, es estático
+→ Simplemente llama: EventManager.Broadcast(...)
+
+ERROR: "Script compilation error"
+→ Verifica que los archivos están en sus carpetas correctas
+→ Assets/Scripts/Core/GameManager.cs
+→ Assets/Scripts/Data/GameSaveData.cs
+→ etc.
+
+ERROR: "No se ve nada en Console"
+→ Abre Window → General → Console (debajo de la escena)
+→ Busca logs que empiezan con [GameManager]
+
+ERROR: "Jugador no se mueve"
+→ Verifica que PlayerController está adjunto al Player
+→ Verifica que Ground Layer está seteado correctamente
+→ Revisa Console por errores
+
+
+════════════════════════════════════════════════════════════════════════════
+📖 DOCUMENTACIÓN PARA LEER DESPUÉS
+════════════════════════════════════════════════════════════════════════════
+
+1. COMIENZA_AQUI.txt (lee después del QUICK START)
+2. MAP_STRUCTURE.txt (ver estructura completa)
+3. ARQUITECTURA_BRUTAL.txt (detalles técnicos)
+4. RESUMEN_ENTREGA.txt (qué recibiste exactamente)
+
+
+════════════════════════════════════════════════════════════════════════════
+🚀 CÓMO SABER QUE ESTÁ FUNCIONANDO
+════════════════════════════════════════════════════════════════════════════
+
+En Console durante el juego, deberías ver:
+
+INICIO:
+  "[GameManager] Inicializado | Ruta: ..."
+  "[GameManager] Nuevo juego creado"
+
+MOVIMIENTO:
+  (Presionar Space)
+  "[EventManager] Broadcast PlayerJumpedEvent a X handler(s)"
+
+DASH:
+  (Presionar Y)
+  "[EventManager] Broadcast PlayerDashedEvent a X handler(s)"
+
+ATAQUE:
+  (Presionar P)
+  "[EventManager] Broadcast PlayerAttackedEvent a X handler(s)"
+
+Si ves esto = ARQUITECTURA ESTÁ FUNCIONANDO ✅
+
+
+════════════════════════════════════════════════════════════════════════════
+⏱️ TIMELINE
+════════════════════════════════════════════════════════════════════════════
+
+HOY:
+  - 30 min: Este QUICK START + pasos 1-3
+  - 1-2 horas: Refactorizar los 4 archivos (paso 4)
+  - TOTAL: 2 horas para que esté 100% funcional
+
+ESTA SEMANA:
+  - BaseEnemy + tipos
+  - BaseBoss + bosses
+  - AudioManager
+  - HUDManager
+  - TOTAL: ~6 horas
+
+TOTAL PROYECTO:
+  - ~8-10 horas para arquitectura completa + pulido
+
+
+════════════════════════════════════════════════════════════════════════════
+
+¿LISTO? Adelante! 🚀
+
+Cuando termines los 4 pasos, tu juego estará funcional con arquitectura
+profesional. Desde ese punto, agregar features es mucho más fácil.
+
+═══════════════════════════════════════════════════════════════════════════
+
+Cualquier duda: lee COMIENZA_AQUI.txt o ARQUITECTURA_BRUTAL.txt
+
+╚════════════════════════════════════════════════════════════════════════════╝

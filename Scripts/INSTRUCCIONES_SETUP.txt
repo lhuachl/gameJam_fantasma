@@ -1,0 +1,117 @@
+/*
+╔════════════════════════════════════════════════════════════════════════════╗
+║              SETUP INICIAL EN UNITY - FASE 1 CONFIGURACIÓN               ║
+║                        (HACER ANTES DE REFACTORIZAR)                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+PASO 1: Crear GameManager en la Escena
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. En Unity, abre tu escena principal (la que tiene el menú o donde carga el juego)
+2. Clic derecho en Hierarchy → Create Empty
+3. Renombra a "GameManager"
+4. Arrastra Core/GameManager.cs al objeto en Hierarchy
+5. Debería aparecer el componente en Inspector
+6. Las propiedades debería verse:
+   - saveFolderName: "Guardado"
+   - saveFileName: "guardado.json"
+
+VERIFICACIÓN: 
+  ✓ El objeto tiene el script GameManager.cs
+  ✓ No hay errores en rojo en el script
+  ✓ En Console aparece: "GameManager: Nuevo juego creado" (o "cargado")
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 2: Crear EventManager en la Escena
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. En Unity, misma escena
+2. Clic derecho en Hierarchy → Create Empty
+3. Renombra a "EventManager"
+4. Arrastra Core/EventManager.cs al objeto
+5. Debería aparecer el componente en Inspector (sin propiedades configurables)
+
+VERIFICACIÓN:
+  ✓ El objeto tiene el script EventManager.cs
+  ✓ No hay errores en rojo en el script
+  ✓ En Console aparece: "EventManager: Subscrito a ..." (cuando algo se suscribe)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 3: Verificar Compilación
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Window → Console (abre la consola)
+2. Busca errores en rojo
+3. Si TODO compila (sin errores), continuamos
+
+POSIBLE ERROR: "Cannot find type 'SaveData'"
+  SOLUCIÓN: SaveData está dentro de GameManager.cs, debería compilar
+
+POSIBLE ERROR: "Script GameManager.cs is missing"
+  SOLUCIÓN: Verificar que el archivo está en Assets/Scripts/Core/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 4: Hacer que NO se destruyan (DontDestroyOnLoad)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GameManager y EventManager ya tienen DontDestroyOnLoad() en el código
+Lo que significa que persistirán entre cambios de escena
+
+VERIFICACIÓN:
+  - Juega, carga siguiente escena
+  - En Hierarchy deberías ver que GameManager y EventManager siguen existiendo
+  - No deberían aparecer duplicados
+
+SI APARECEN DUPLICADOS:
+  El código del Singleton detecta duplicados y los destruye
+  Debería ser automático, si no: revisa Awake() del script
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PASO 5: Crear Carpeta Core (si no existe)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. En File Explorer, ve a Assets/Scripts/
+2. Crea carpeta "Core" (si no existe)
+3. Mueve GameManager.cs y EventManager.cs a esa carpeta
+4. En Unity, debería importar automáticamente
+
+Si Unity muestra errores después:
+  Assets → Reimport All
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRUEBA INICIAL (antes de refactorizar nada)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Play en Unity
+2. Observa Console:
+   - "GameManager: Nuevo juego creado" o "GameManager: Guardado cargado"
+   - Si todo OK, continúa
+
+3. Detén Play
+
+SI ALGO NO COMPILA:
+  Antes de continuar con refactorización, reporta:
+  
+  ARCHIVO: [cuál]
+  ERROR: [exacto de console]
+  LÍNEA: [número]
+  
+  No continúes hasta que esto esté resuelto
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHECKLIST ANTES DE EMPEZAR REFACTORIZACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ GameManager.cs en Assets/Scripts/Core/
+✓ EventManager.cs en Assets/Scripts/Core/
+✓ Ambos scripts agregan componentes a GameObjects en escena
+✓ No hay errores de compilación en Console
+✓ GameManager muestra mensaje de inicialización
+✓ Play → carga juego normalmente
+✓ Stop → sin errores
+✓ Leíste PROXIMO_PASO_FASE1.txt completamente
+
+SI TODO ESTÁ ✓, LISTO PARA REFACTORIZAR
+
+╚════════════════════════════════════════════════════════════════════════════╝
+*/

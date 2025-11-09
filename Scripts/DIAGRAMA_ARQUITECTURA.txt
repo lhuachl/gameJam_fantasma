@@ -1,0 +1,297 @@
+/*
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    DIAGRAMA DE ARQUITECTURA Y FLUJOS                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+ANTES (ARQUITECTURA ACTUAL - PROBLEMAS):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    NewGame.cs              Continue.cs             Finish.cs
+        ↓                       ↓                        ↓
+    SaveData            SaveData (DIFERENTE)    SaveData (DIFERENTE)
+        ↓                       ↓                        ↓
+    File.Write()        File.Read()             File.Write()
+        ↓                       ↓                        ↓
+    GeneradorNivel
+        ↓
+    SaveData (DIFERENTE)
+        ↓
+    File.Read()
+        ↓
+    ??? Inconsistencia
+
+PROBLEMAS:
+❌ 4 definiciones diferentes de SaveData
+❌ Si cambias una, rompes las otras
+❌ Datos pueden perderse
+❌ Cada uno lee/escribe por su lado
+
+DESPUÉS (ARQUITECTURA NUEVA - SOLUCIÓN):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    NewGame.cs          Continue.cs             Finish.cs
+        ↓                   ↓                       ↓
+        └───────────────────┼───────────────────┘
+                            ↓
+                    ┌─ GameManager ─┐
+                    │               │
+                SaveData (ÚNICA)    EventManager
+                    │               │
+                File I/O      Broadcast Events
+                    │               │
+        ┌───────────┼───────────────┤
+        ↓           ↓               ↓
+   GeneradorNivel  Boss.cs        AudioManager
+   SceneLoader     EnemyController UIManager
+
+VENTAJAS:
+✅ SaveData única, sincronizada
+✅ Comunicación por eventos (desacoplada)
+✅ Fácil de mantener
+✅ Escalar es trivial
+
+════════════════════════════════════════════════════════════════════════════
+FLUJO DE JUEGO - SISTEMA NUEVO
+════════════════════════════════════════════════════════════════════════════
+
+INICIO:
+┌─────────────────────────────────────────────────┐
+│ Unity carga escena                              │
+└────────────────┬────────────────────────────────┘
+                 ↓
+        ┌─ GameManager.Awake() ─┐
+        │ - Carga SaveData      │
+        │ - Crea Singleton      │
+        │ - DontDestroyOnLoad() │
+        └──────────┬────────────┘
+                   ↓
+        ┌─ EventManager.Awake() ─┐
+        │ - Crea Singleton       │
+        │ - DontDestroyOnLoad()  │
+        └──────────┬─────────────┘
+                   ↓
+        ┌─ Otros sistemas se inician ─┐
+        │ - Pueden acceder a          │
+        │   GameManager.Instance      │
+        │   EventManager.Instance     │
+        └──────────┬──────────────────┘
+                   ↓
+          JUEGO LISTO PARA JUGAR
+
+DURANTE JUEGO - COMPLETAR NIVEL:
+┌──────────────────────────────────────────────────┐
+│ Jugador llega a meta (E)                         │
+└──────────────┬───────────────────────────────────┘
+               ↓
+    ┌─ Finish.OnTriggerEnter2D() ─┐
+    │ Mostrar UI cinemática       │
+    │ Esperar decisión (B/M)      │
+    └──────────┬──────────────────┘
+               ↓
+    ┌─ Decisión tomada ─┐
+    │ BUENO o MALO      │
+    └──────────┬────────┘
+               ↓
+    ┌─ GameManager.ProgressToNextLevel() ─┐
+    │ - Guarda decisión                   │
+    │ - Si es zona par: pendingBoss=true  │
+    │ - Avanza nivel                      │
+    │ - Guarda a JSON                     │
+    └──────────┬────────────────────────┘
+               ↓
+    ┌─ EventManager.Broadcast() ─┐
+    │   DecisionMadeEvent         │
+    └──────────┬──────────────────┘
+               ↓
+         Escena recarga
+               ↓
+    ┌─ GameManager carga nuevamente ─┐
+    │ Lee JSON actualizado            │
+    │ Level correcto, pendingBoss OK  │
+    └──────────┬────────────────────┘
+               ↓
+    ┌─ GeneradorNivel carga nivel ─┐
+    │ Si pendingBoss: carga boss     │
+    │ Si no: carga nivel normal      │
+    └────────────────────────────────┘
+
+DURANTE JUEGO - DERROTAR BOSS:
+┌──────────────────────────────────────────────────┐
+│ Boss.TakeDamage() → currentHealth ≤ 0           │
+└──────────────┬───────────────────────────────────┘
+               ↓
+    ┌─ Boss.Die() ─┐
+    │ - Animación  │
+    │ - Broadcast  │
+    └──────┬───────┘
+           ↓
+    ┌─ EventManager.Broadcast() ─────────────┐
+    │   BossDefeatedEvent { bossId="boss1" }  │
+    └──────┬─────────────────────────────────┘
+           ↓
+    Todos los suscriptores se notifican:
+    ├─→ GameManager.DefeatBoss("boss1")
+    │   - Marca: boss1Derrotado = true
+    │   - Limpia: pendingBoss = false
+    │   - Guarda a JSON
+    │
+    ├─→ AudioManager
+    │   - Toca música de victoria
+    │
+    ├─→ UIManager
+    │   - Muestra "Boss Defeated!"
+    │
+    └─→ GeneradorNivel.OnBossDefeated()
+        - Carga siguiente nivel normal
+        - Transición suave
+
+════════════════════════════════════════════════════════════════════════════
+ESTRUCTURA DE CLASES - HERENCIA
+════════════════════════════════════════════════════════════════════════════
+
+ENEMIGOS (después de Fase 5):
+
+    BaseEnemy (clase abstracta)
+    ├─ virtual TakeDamage()
+    ├─ virtual Die()
+    ├─ protected rb, currentHealth
+    │
+    ├── BasicEnemy (X)
+    │   └─ velocidad normal, vida normal
+    │
+    ├── FastEnemy (Y)
+    │   └─ velocidad alta, vida baja
+    │
+    ├── StrongEnemy (Z)
+    │   └─ velocidad baja, vida alta, armor
+    │
+    └── FlyingEnemy (V)
+        └─ sin gravity, patrón diferente
+
+BOSSES (después de Fase 4):
+
+    BaseBoss (clase abstracta)
+    ├─ virtual Enter()
+    ├─ abstract Phase1()
+    ├─ abstract Phase2()
+    ├─ abstract OnDefeated()
+    │
+    ├── Boss1 (nivel 3)
+    │   └─ Implementa fase 1, fase 2 únicas
+    │
+    └── FinalBoss (nivel 6+)
+        └─ Implementa fase 1, fase 2 únicas
+
+════════════════════════════════════════════════════════════════════════════
+ESTADO DEL PROYECTO - PROGRESO
+════════════════════════════════════════════════════════════════════════════
+
+FASE 1: CENTRALIZACIÓN
+   [████████░░] 50% - GameManager y EventManager creados
+                       Falta refactorizar 5 archivos
+
+FASE 2: COMUNICACIÓN
+   [░░░░░░░░░░] 0%  - Por hacer
+
+FASE 3: INTERFACES
+   [░░░░░░░░░░] 0%  - Por hacer
+
+FASE 4: BOSSES
+   [░░░░░░░░░░] 0%  - Por hacer
+
+FASE 5: ENEMIGOS
+   [░░░░░░░░░░] 0%  - Por hacer
+
+FASE 6: UPGRADES
+   [░░░░░░░░░░] 0%  - Por hacer
+
+FASE 7: AUDIO
+   [░░░░░░░░░░] 0%  - Por hacer
+
+FASE 8: PULIDO
+   [░░░░░░░░░░] 0%  - Por hacer
+
+TOTAL: [████░░░░░░] 12.5% del roadmap completado
+
+════════════════════════════════════════════════════════════════════════════
+COMPARACIÓN DE COMPLEJIDAD - REFACTORIZACIÓN
+════════════════════════════════════════════════════════════════════════════
+
+NewGame.cs refactorización:
+  Cambios: 5 líneas
+  Tiempo: 10 minutos
+  Riesgo: BAJO
+  Dificultad: ★☆☆☆☆
+
+Continue.cs refactorización:
+  Cambios: 3 líneas
+  Tiempo: 5 minutos
+  Riesgo: BAJO
+  Dificultad: ★☆☆☆☆
+
+Boss.cs refactorización:
+  Cambios: 2 líneas
+  Tiempo: 5 minutos
+  Riesgo: BAJO
+  Dificultad: ★☆☆☆☆
+
+GeneradorNivel.cs refactorización:
+  Cambios: ~50 líneas
+  Tiempo: 30-45 minutos
+  Riesgo: MEDIO
+  Dificultad: ★★★☆☆
+
+Finish.cs refactorización:
+  Cambios: ~30 líneas
+  Tiempo: 30 minutos
+  Riesgo: MEDIO
+  Dificultad: ★★★☆☆
+
+════════════════════════════════════════════════════════════════════════════
+PRÓXIMOS PASOS VISUALES
+════════════════════════════════════════════════════════════════════════════
+
+DÍA 1:
+  Setup (30 min)
+  ↓
+  NewGame + Continue (15 min)
+  ↓
+  Boss + pequeño testing (15 min)
+  ↓
+  ESTADO: 25% refactorización, juego funciona
+
+DÍA 2:
+  GeneradorNivel completo (45 min)
+  ↓
+  Finish completo (30 min)
+  ↓
+  Testing end-to-end (30 min)
+  ↓
+  ESTADO: 100% FASE 1 COMPLETA, SaveData centralizado
+
+DÍA 3+:
+  Fase 2, 3, 4, 5, 6, 7, 8 según plan
+  ↓
+  Juego profesional, mantenible, escalable
+
+════════════════════════════════════════════════════════════════════════════
+INDICADORES DE ÉXITO
+════════════════════════════════════════════════════════════════════════════
+
+FASE 1 COMPLETADA cuando:
+
+✓ Crear nuevo juego → guardado se crea
+✓ Continuar → carga nivel correcto
+✓ Completar nivel → progresa a siguiente
+✓ Cerrar aplicación → datos persist
+✓ Abrir → donde dejaste está intacto
+✓ Derrotar boss → evento se dispara
+✓ Siguiente nivel carga automáticamente
+✓ Sin duplicación de SaveData
+✓ Sin crashes por datos inconsistentes
+✓ Console muestra eventos correctamente
+
+SI TODO ESTO FUNCIONA: ✅ FASE 1 EXITOSA
+
+╚════════════════════════════════════════════════════════════════════════════╝
+*/

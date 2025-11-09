@@ -1,0 +1,364 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                         📑 ÍNDICE DE ARCHIVOS                             ║
+║                     (Qué leer y en qué orden)                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+🎯 LECTURA SECUENCIAL (Recomendado)
+════════════════════════════════════════════════════════════════════════════
+
+1️⃣ 00_LEEME_PRIMERO.txt (Este archivo)
+   ⏱️ 5 minutos
+   📖 Qué recibiste en resumen
+   ✅ Leer PRIMERO
+
+2️⃣ QUICK_START.txt
+   ⏱️ 15-30 minutos
+   📖 Cómo configurar en Unity hoy (paso a paso)
+   ✅ Leer SEGUNDA
+
+3️⃣ COMIENZA_AQUI.txt
+   ⏱️ 20-30 minutos
+   📖 Refactorizar scripts viejos (guía detallada)
+   ✅ Leer TERCERA
+
+4️⃣ ARQUITECTURA_BRUTAL.txt
+   ⏱️ Consultar según sea necesario
+   📖 Referencia técnica completa
+   ✅ Leer cuando necesites detalles
+
+
+════════════════════════════════════════════════════════════════════════════
+📂 ARCHIVOS POR CATEGORÍA
+════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTACIÓN:
+  ├─ 00_LEEME_PRIMERO.txt (este archivo)
+  ├─ QUICK_START.txt (cómo empezar hoy)
+  ├─ COMIENZA_AQUI.txt (guía detallada)
+  ├─ ARQUITECTURA_BRUTAL.txt (referencia técnica)
+  ├─ MAP_STRUCTURE.txt (árbol de proyecto)
+  ├─ RESUMEN_ENTREGA.txt (lo que recibiste)
+  └─ INDICE_ARCHIVOS.txt (este, para navegar)
+
+💻 CÓDIGO PRODUCCIÓN:
+  ├─ Core/GameManager.cs (singleton estado global)
+  ├─ Data/GameSaveData.cs (estructura serializable)
+  ├─ Utilities/Events/EventManager.cs (pub/sub)
+  ├─ Utilities/Events/GameEvents.cs (13 eventos)
+  ├─ Utilities/Interfaces/IDamageable.cs (interfaz)
+  ├─ Utilities/Interfaces/IEnemy.cs (interfaz)
+  ├─ Utilities/Interfaces/IBoss.cs (interfaz)
+  ├─ Entities/Player/PlayerController.cs (jugador mejorado)
+  └─ Managers/CameraManager.cs (camera suave)
+
+🔧 CARPETAS ORGANIZADAS:
+  ├─ Core/
+  ├─ Data/
+  ├─ Utilities/Interfaces/
+  ├─ Utilities/Events/
+  ├─ Entities/Player/
+  ├─ Entities/Enemy/Base/
+  ├─ Entities/Enemy/Types/
+  ├─ Entities/Boss/
+  ├─ Managers/
+  ├─ Level/
+  ├─ UI/
+  └─ Data/
+
+
+════════════════════════════════════════════════════════════════════════════
+🗺️ MAPA DE LECTURA POR TIPO DE USUARIO
+════════════════════════════════════════════════════════════════════════════
+
+👤 SI ERES "QUIERO EMPEZAR AHORA":
+   1. Lee: 00_LEEME_PRIMERO.txt (5 min)
+   2. Lee: QUICK_START.txt (20 min)
+   3. Ve a Unity y sigue pasos
+   4. Presiona PLAY
+   5. Verifica logs en Console
+   ✅ LISTO EN 1 HORA
+
+👤 SI ERES "NECESITO ENTENDER TODO":
+   1. Lee: 00_LEEME_PRIMERO.txt (5 min)
+   2. Lee: COMIENZA_AQUI.txt (30 min)
+   3. Lee: ARQUITECTURA_BRUTAL.txt (30 min)
+   4. Revisa MAP_STRUCTURE.txt (10 min)
+   5. Haz preguntas si necesitas
+   ✅ ENTIENDES EN 1.5 HORAS
+
+👤 SI ERES "SOLO DAME LOS CÓDIGOS":
+   1. Core/GameManager.cs → Usa en tu juego
+   2. Data/GameSaveData.cs → Estructura de datos
+   3. Utilities/Events/ → Copia ambos archivos
+   4. Entities/Player/PlayerController.cs → Reemplaza input
+   5. Lee COMIENZA_AQUI.txt para integración
+   ✅ CÓDIGO FUNCIONANDO EN 30 MIN
+
+👤 SI ENCUENTRAS ERROR:
+   1. Console → Busca el error exacto
+   2. ARQUITECTURA_BRUTAL.txt → Busca solución
+   3. Revisa QUICK_START.txt sección "SI ALGO SALE MAL"
+   4. Verifica que archivos están en carpetas correctas
+   ✅ SOLUCIONADO EN 10 MIN
+
+
+════════════════════════════════════════════════════════════════════════════
+🔎 BÚSQUEDA RÁPIDA: ¿DÓNDE ESTÁ...?
+════════════════════════════════════════════════════════════════════════════
+
+¿DÓNDE ESTÁ...?
+
+...GameManager?
+  → Core/GameManager.cs (265 líneas)
+  → Explicado en: ARQUITECTURA_BRUTAL.txt sección "GameManager"
+
+...el sistema de eventos?
+  → Utilities/Events/EventManager.cs (pub/sub)
+  → Utilities/Events/GameEvents.cs (13 eventos)
+  → Explicado en: COMIENZA_AQUI.txt sección "Sistema de eventos"
+
+...el jugador mejorado?
+  → Entities/Player/PlayerController.cs (350 líneas)
+  → Explicado en: QUICK_START.txt PASO 2
+
+...la camera?
+  → Managers/CameraManager.cs (35 líneas)
+  → Explicado en: QUICK_START.txt PASO 2
+
+...las interfaces?
+  → Utilities/Interfaces/IDamageable.cs
+  → Utilities/Interfaces/IEnemy.cs
+  → Utilities/Interfaces/IBoss.cs
+  → Explicado en: ARQUITECTURA_BRUTAL.txt sección "Interfaces"
+
+...BaseEnemy y tipos de enemigos?
+  → AÚN NO CREADO
+  → Cómo hacerlo: ARQUITECTURA_BRUTAL.txt sección "Enemy"
+
+...BaseBoss y bosses?
+  → AÚN NO CREADO
+  → Cómo hacerlo: ARQUITECTURA_BRUTAL.txt sección "Boss"
+
+...la estructura JSON?
+  → Data/GameSaveData.cs (contiene la clase)
+  → Explicado en: ARQUITECTURA_BRUTAL.txt sección "JSON"
+
+...cómo usar GameManager desde otro script?
+  → Ejemplos en: ARQUITECTURA_BRUTAL.txt sección "Cómo usar"
+  → int level = GameManager.Instance.GetCurrentLevel();
+
+...cómo escuchar eventos?
+  → Ejemplos en: COMIENZA_AQUI.txt
+  → EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+
+...pasos exactos para setup en Unity?
+  → QUICK_START.txt PASO 2 (detallado)
+
+...cómo refactorizar los scripts viejos?
+  → COMIENZA_AQUI.txt PASO 2 (pseudo-código incluido)
+
+...la timeline para completar todo?
+  → QUICK_START.txt sección "Timeline"
+  → O COMIENZA_AQUI.txt sección "Timeline"
+
+
+════════════════════════════════════════════════════════════════════════════
+📊 RESUMEN POR DOCUMENTO
+════════════════════════════════════════════════════════════════════════════
+
+┌─ 00_LEEME_PRIMERO.txt ────────────────────────────────────────────────┐
+│ Qué es:        Resumen ejecutivo de todo                              │
+│ Cuándo leer:   PRIMERO (5 minutos)                                    │
+│ Propósito:     Entender qué recibiste                                 │
+│ Lecciones:     "Antes vs Ahora", ventajas, timeline                   │
+│ Acción:        Ir a QUICK_START.txt                                   │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ QUICK_START.txt ─────────────────────────────────────────────────────┐
+│ Qué es:        Guía de 30 minutos para empezar hoy                    │
+│ Cuándo leer:   SEGUNDO (15-30 minutos)                                │
+│ Propósito:     Configurar en Unity y verificar que funciona           │
+│ Lecciones:     Paso a paso: agregar managers, reemplazar scripts      │
+│ Acción:        Hacer los 4 pasos en Unity                             │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ COMIENZA_AQUI.txt ───────────────────────────────────────────────────┐
+│ Qué es:        Guía detallada de refactorización                      │
+│ Cuándo leer:   TERCERA (20-30 minutos)                                │
+│ Propósito:     Refactorizar scripts viejos                            │
+│ Lecciones:     Cómo cambiar NewGame, Continue, Boss, Finish, etc.     │
+│ Acción:        Refactorizar los 4 archivos clave                      │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ ARQUITECTURA_BRUTAL.txt ────────────────────────────────────────────┐
+│ Qué es:        Referencia técnica completa                            │
+│ Cuándo leer:   CONSULTAR cuando necesites detalles                   │
+│ Propósito:     Explicación profunda de cada sistema                   │
+│ Lecciones:     Flujo de datos, ejemplo de uso, debugging              │
+│ Acción:        Búsqueda CTRL+F para encontrar lo que necesitas        │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ MAP_STRUCTURE.txt ───────────────────────────────────────────────────┐
+│ Qué es:        Árbol de carpetas anotado                              │
+│ Cuándo leer:   REFERENCIA mientras programas                          │
+│ Propósito:     Ver estructura completa de proyecto                    │
+│ Lecciones:     Dónde va cada archivo, qué contiene cada carpeta       │
+│ Acción:        Mirar cuando no sabes dónde crear un archivo           │
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ RESUMEN_ENTREGA.txt ─────────────────────────────────────────────────┐
+│ Qué es:        Comparación antes vs ahora + ventajas                  │
+│ Cuándo leer:   OPCIONAL, para refuerzo conceptual                     │
+│ Propósito:     Motivación y entendimiento de cambios                  │
+│ Lecciones:     Por qué es mejor, casos de uso, scenarios              │
+│ Acción:        Compartir con otros devs para entiendan la arquitectura│
+└────────────────────────────────────────────────────────────────────────┘
+
+┌─ INDICE_ARCHIVOS.txt (este) ──────────────────────────────────────────┐
+│ Qué es:        Navigation guide                                       │
+│ Cuándo leer:   CUANDO TE PIERDAS                                      │
+│ Propósito:     Encontrar qué leer según tu necesidad                  │
+│ Lecciones:     Mapas de lectura, búsqueda rápida                      │
+│ Acción:        Volver a consultar este archivo                        │
+└────────────────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════
+🎓 ROADMAP DE APRENDIZAJE
+════════════════════════════════════════════════════════════════════════════
+
+PRIMER DÍA (2 horas):
+  ✅ 00_LEEME_PRIMERO.txt (5 min)
+  ✅ QUICK_START.txt (20 min)
+  ✅ Configurar en Unity (30 min)
+  ✅ Verificar que funciona (10 min)
+  ✅ COMIENZA_AQUI.txt (20 min)
+  ✅ Refactorizar scripts viejos (35 min)
+
+DURANTE SEMANA:
+  ✅ ARQUITECTURA_BRUTAL.txt (referencia, consultar)
+  ✅ Crear BaseEnemy + tipos
+  ✅ Crear BaseBoss + bosses
+  ✅ Crear AudioManager
+  ✅ Crear HUDManager
+
+CONCEPTOS CLAVE A APRENDER:
+  1. Singleton pattern (GameManager)
+  2. Pub/Sub event system (EventManager)
+  3. Interface contracts (IDamageable, IEnemy, IBoss)
+  4. Inheritance for reuse (BaseEnemy, BaseBoss)
+  5. Dependency injection (passar referencias)
+  6. Single Responsibility Principle (1 clase = 1 cosa)
+  7. DRY - Don't Repeat Yourself (herencia, no copy-paste)
+  8. Serialization (JSON para save/load)
+
+
+════════════════════════════════════════════════════════════════════════════
+❓ PREGUNTAS FRECUENTES SOBRE DOCUMENTACIÓN
+════════════════════════════════════════════════════════════════════════════
+
+P: ¿Debo leer TODO?
+R: No. Lee 00_LEEME_PRIMERO + QUICK_START.txt. Consulta resto según necesites.
+
+P: ¿En qué orden?
+R: 00_LEEME_PRIMERO → QUICK_START → COMIENZA_AQUI → Resto según necesidad
+
+P: ¿Qué hago si algo no entiedo?
+R: Busca en ARQUITECTURA_BRUTAL.txt con CTRL+F. Tiene todo explicado.
+
+P: ¿Hay videos?
+R: No, solo documentación escrita (más fácil de búsqueda y referencia)
+
+P: ¿Puedo saltarme documentación e ir directo a código?
+R: Posible pero NO RECOMENDADO. Los documentos explican el por qué.
+
+P: ¿Qué pasa si solo necesito el código?
+R: Ve a "SI ERES 'SOLO DAME LOS CÓDIGOS'" en esta sección.
+
+
+════════════════════════════════════════════════════════════════════════════
+⚡ ATAJO: TODO EN 1 HORA
+════════════════════════════════════════════════════════════════════════════
+
+Si tienes POCO TIEMPO:
+
+0:00-0:05 → Lee: 00_LEEME_PRIMERO.txt
+0:05-0:15 → Lee: QUICK_START.txt PASO 1
+0:15-0:35 → Sigue: QUICK_START.txt PASOS 2-3 en Unity
+0:35-0:45 → Verifica: Presiona PLAY, mira logs
+0:45-1:00 → Siguiente: Comienza COMIENZA_AQUI.txt
+
+✅ Arquitectura configurada en 1 hora
+
+
+════════════════════════════════════════════════════════════════════════════
+📞 SOPORTE: ¿QUÉ LEER SI...?
+════════════════════════════════════════════════════════════════════════════
+
+...me da error al compilar?
+→ QUICK_START.txt sección "SI ALGO SALE MAL"
+
+...no veo logs en Console?
+→ QUICK_START.txt sección "SI ALGO SALE MAL"
+
+...datos se pierden al guardar?
+→ ARQUITECTURA_BRUTAL.txt sección "SaveData"
+
+...no sé cómo agregar un enemigo nuevo?
+→ MAP_STRUCTURE.txt sección "Enemy/Types"
+→ ARQUITECTURA_BRUTAL.txt sección "Cómo agregar enemigos"
+
+...no sé cómo agregar un boss nuevo?
+→ MAP_STRUCTURE.txt sección "Boss"
+→ ARQUITECTURA_BRUTAL.txt sección "Cómo agregar bosses"
+
+...necesito entender el flujo del juego?
+→ ARQUITECTURA_BRUTAL.txt sección "Flujo de datos"
+
+...necesito entender los eventos?
+→ ARQUITECTURA_BRUTAL.txt sección "Sistema de eventos"
+→ Utilities/Events/GameEvents.cs (ver lista de eventos)
+
+...necesito entender las interfaces?
+→ ARQUITECTURA_BRUTAL.txt sección "Interfaces"
+→ Utilities/Interfaces/ (ver definiciones)
+
+...quiero entender por qué esto es mejor?
+→ 00_LEEME_PRIMERO.txt sección "Ventajas"
+→ RESUMEN_ENTREGA.txt sección "Poder de arquitectura"
+
+
+════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST DE LECTURA
+════════════════════════════════════════════════════════════════════════════
+
+[ ] Leí 00_LEEME_PRIMERO.txt
+[ ] Leí QUICK_START.txt
+[ ] Configuré GameManager en Unity
+[ ] Configuré EventManager en Unity
+[ ] Reemplacé PlayerController
+[ ] Reemplacé CameraManager
+[ ] Presioné PLAY y verifiqué logs
+[ ] Leí COMIENZA_AQUI.txt
+[ ] Refactorizaré los 4 scripts viejos
+[ ] Consulté ARQUITECTURA_BRUTAL.txt cuando lo necesité
+[ ] Revisé MAP_STRUCTURE.txt para navegar proyecto
+[ ] Entiendo por qué esta arquitectura es mejor
+
+Si marcaste TODO, ¡estás listo! 🚀
+
+
+════════════════════════════════════════════════════════════════════════════
+
+RESUMEN FINAL:
+
+📖 LEE EN ESTE ORDEN:
+   1. 00_LEEME_PRIMERO.txt (5 min)
+   2. QUICK_START.txt (20 min)
+   3. COMIENZA_AQUI.txt (20 min)
+   4. ARQUITECTURA_BRUTAL.txt (consultar)
+
+✨ LISTO EN 1-2 HORAS
+
+╚════════════════════════════════════════════════════════════════════════════╝

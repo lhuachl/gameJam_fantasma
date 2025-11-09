@@ -1,0 +1,470 @@
+/*
+╔════════════════════════════════════════════════════════════════════════════╗
+║                         GAME JAM 2 - GAMELOG                             ║
+║                    Arquitectura de Software en Tiempo Real                ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+ÚLTIMA ACTUALIZACIÓN: 8 de Noviembre de 2025 - 22:45
+ARQUITECTO: GitHub Copilot
+ESTADO: � FASE 1 EN PROGRESO (GameManager + EventManager creados)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 VISIÓN DEL PROYECTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TIPO: Plataformero Lineal con Decisiones Branching
+FORMATO: Cada CSV = un mapa de plataformero (tipo Mario)
+PROGRESIÓN: Lineal (Nivel 1 → 2 → 3 → ...) pero con ramas de finales
+FINALES: BUENO/MALO crean ramificaciones narrativas en JSON
+
+FLUJO:
+  Nivel 1 (CSV) → Nivel 2 (CSV) → Nivel 3 [BOSS PAR] → 
+    └─ Decisión BUENO/MALO → Desbloquea final específico → 
+      Nivel 4 → Nivel 5 → Nivel 6 [BOSS PAR] → ...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ CONFIRMACIONES DEL USUARIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ JSON es suficiente (no usar ScriptableObject)
+✓ Upgrades son PERMANENTES entre niveles
+✓ Cada Boss tiene ESENCIA DIFERENTE y comportamiento único
+✓ Enemigos tienen DIFERENTES comportamientos por tipo (X, Y, Z, V)
+✓ Hay sprites de algunos bosses
+✓ Hay MÚSICA POR ZONA y MÚSICA POR BOSS
+✓ Dash debe hacer INTANGIBLE al jugador durante ejecución
+✓ Dash eleva (parámetros Y ya configurables)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏗️ ARQUITECTURA ACORDADA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PILLARES PRINCIPALES:
+  1. GameManager (singleton) - Estado global centralizado
+  2. EventManager - Comunicación desacoplada entre sistemas
+  3. SaveManager - Persistencia JSON única
+  4. BaseBoss (clase abstracta) - Patrón para todos los bosses
+  5. BaseEnemy (clase abstracta) - Patrón para todos los enemigos
+  6. Interfaces: IDamageable, IEnemy, IBoss
+
+ESTRUCTURA DE CARPETAS:
+  Assets/Scripts/
+  ├── Core/
+  │   ├── GameManager.cs [TODO: CREAR]
+  │   ├── EventManager.cs [TODO: CREAR]
+  │   ├── GameState.cs [TODO: CREAR]
+  │   └── GameEvents.cs [TODO: CREAR]
+  │
+  ├── Interfaces/
+  │   ├── IDamageable.cs [TODO: CREAR]
+  │   └── IEnemy.cs [TODO: CREAR]
+  │
+  ├── Managers/
+  │   ├── SaveManager.cs [TODO: REFACTORIZAR]
+  │   ├── AudioManager.cs [TODO: CREAR]
+  │   └── LevelManager.cs [TODO: REFACTORIZAR GeneradorNivel]
+  │
+  ├── Entities/
+  │   ├── Base/
+  │   │   ├── BaseEnemy.cs [TODO: CREAR - extraer de EnemyController]
+  │   │   └── BaseBoss.cs [TODO: CREAR - extraer de Boss.cs]
+  │   │
+  │   ├── Enemy/
+  │   │   ├── BasicEnemy.cs [TODO: CREAR - hereda BaseEnemy]
+  │   │   ├── FastEnemy.cs [TODO: CREAR - hereda BaseEnemy]
+  │   │   ├── StrongEnemy.cs [TODO: CREAR - hereda BaseEnemy]
+  │   │   └── FlyingEnemy.cs [TODO: CREAR - hereda BaseEnemy]
+  │   │
+  │   ├── Boss/
+  │   │   ├── Boss1.cs [TODO: REFACTORIZAR - hereda BaseBoss]
+  │   │   └── FinalBoss.cs [TODO: REFACTORIZAR - hereda BaseBoss]
+  │   │
+  │   └── Player/
+  │       ├── PlayerController.cs [REFACTORIZAR]
+  │       └── PlayerDash.cs [TODO: SEPARAR LÓGICA]
+  │
+  └── Level/
+      ├── LevelGenerator.cs [EXISTE - renombrar GeneradorNivel]
+      └── LevelTransition.cs [TODO: CREAR]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ESTRUCTURA JSON FINAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{
+  "nivelActual": 1,
+  "finalBueno": 0,
+  "finalMalo": 0,
+  "boss1Derrotado": false,
+  "boss2Derrotado": false,
+  "pendingBoss": false,
+  "upgrades": {
+    "maxHealthUpgrades": 2,
+    "weaponDamageUpgrades": 1,
+    "specialAbilities": ["dash_enhanced"]
+  },
+  "playerStats": {
+    "currentHealth": 100,
+    "maxHealth": 150,
+    "currentWeaponDamage": 10
+  },
+  "completedZones": [1, 2, 3],
+  "playTime": 3600
+}
+
+CAMBIOS CRÍTICOS:
+  - NO MÁS duplicación de SaveData en 4 archivos
+  - UNA ÚNICA definición en SaveManager.cs
+  - Upgrades persist entre niveles
+  - Cada boss tiene su flag específico
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎮 CAMBIOS EN MECÁNICAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DASH MEJORADO:
+  ✓ Ya tiene parámetros Y (dashSpeedY)
+  ✓ FALTA: Hacer intangible (no ser tocado por enemigos)
+  ✓ FALTA: Propagar isIntangible a EnemyController y Boss
+
+INTANGIBILIDAD EN DASH:
+  Implementación:
+    1. ControlesPersonaje.isIntangible (bool privado)
+    2. Cuando Dash() inicia: isIntangible = true
+    3. Cuando Dash() termina: isIntangible = false
+    4. EnemyController.Attack() chequea: if (player.IsIntangible) return;
+    5. Boss.cs hace lo mismo
+  
+  Impacto: Dash se vuelve útil defensivamente, no solo ofensivo
+
+UPGRADES PERMANENTES:
+  Tipos:
+    - Health upgrades (aumentan maxHealth)
+    - Weapon upgrades (aumentan damage)
+    - Special abilities (nuevas mecánicas)
+  
+  Cómo se aplican:
+    1. Se encuentran en niveles o se dropean bosses
+    2. Se guardan en JSON
+    3. Se cargan al iniciar nivel siguiente
+    4. Persistent entre niveles
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 SISTEMA DE EVENTOS (EventManager)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EVENTOS CRÍTICOS:
+  - BossDefeatedEvent → Boss1 o Boss2 muere → Notifica GeneradorNivel
+  - LevelCompleteEvent → Jugador toca meta (E) → Inicia transición
+  - PlayerTakeDamageEvent → Jugador recibe daño → Actualiza HUD
+  - UpgradeFoundEvent → Jugador pickea upgrade → Aplica stats
+  - DecisionMadeEvent → Jugador elige BUENO/MALO → Desbloquea rama
+
+FLUJO DE EVENTOS:
+  Boss.Die() → BossDefeatedEvent → EventManager.Broadcast()
+                                 → ProgressionManager.DefeatBoss()
+                                 → GeneradorNivel.OnBossDefeated()
+                                 → Siguiente nivel se carga
+
+VENTAJA: Acoplamiento mínimo, fácil de debuggear
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🐛 BUGS CONOCIDOS A REPARAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔴 CRÍTICO:
+  1. SaveData duplicada en 4 archivos → Puede perder datos
+     SOLUCIÓN: Centralizar en GameManager + SaveManager
+  
+  2. Dash NO es intangible → Enemigos atacan durante dash
+     SOLUCIÓN: Agregar isIntangible a ControlesPersonaje + checkear en enemigos
+  
+  3. FinalBoss.cs está vacío → Necesita implementación
+     SOLUCIÓN: Crear BaseBoss, heredar en FinalBoss
+
+🟡 IMPORTANTE:
+  4. EnemyController sin interfaz → Código duplicado
+     SOLUCIÓN: Crear BaseEnemy, IEnemy interface
+  
+  5. Paredes y fondos renderean en negro → Shader issues
+     SOLUCIÓN: Aplicado en última actualización (material instances)
+  
+  6. Sin AudioManager → Música no sincronizada
+     SOLUCIÓN: Crear AudioManager con EventManager
+
+🟢 COMPLETADO:
+  ✓ Parametrización dash (dashSpeedX, dashSpeedY)
+  ✓ Categorización enemigos (X, Y, Z, V)
+  ✓ Sistema de guardado base
+  ✓ Cinemáticas intro/finales
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 ROADMAP DE IMPLEMENTACIÓN (FASES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FASE 1: CENTRALIZACIÓN (� EN PROGRESO - START HERE)
+  ⏱️ 2-3 horas
+  ✅ Crear GameManager.cs (singleton) - HECHO
+  ✅ Crear EventManager.cs - HECHO (bonificación: eventos completos)
+  ⏳ Crear SaveManager.cs mejorado (integrar en GameManager)
+  ⏳ Refactorizar NewGame.cs → usa GameManager
+  ⏳ Refactorizar Continue.cs → usa GameManager
+  ⏳ Refactorizar Finish.cs → usa GameManager
+  ⏳ Refactorizar GeneradorNivel.cs → usa GameManager + eventos
+  
+  RESULTADO: SaveData centralizado, sincronizado siempre
+  CRITERIO DE ÉXITO: Completar nivel, guardar, cerrar, continuar = sin perder datos
+  
+  PRÓXIMOS PASOS:
+    1. Refactorizar NewGame.cs para usar GameManager.CreateNewGame()
+    2. Refactorizar Continue.cs para usar GameManager.HasSaveFile()
+    3. Refactorizar Finish.cs para usar GameManager.ProgressToNextLevel()
+    4. Conectar GeneradorNivel con EventManager (escuchar BossDefeatedEvent)
+
+FASE 2: EVENTOS Y COMUNICACIÓN
+  ⏱️ 1-2 horas
+  ✓ Crear EventManager.cs
+  ✓ Crear GameEvents.cs (todos los eventos)
+  ✓ Conectar Boss.Die() → BossDefeatedEvent
+  ✓ Conectar Finish.OnTriggerEnter() → LevelCompleteEvent
+  ✓ GeneradorNivel escucha BossDefeatedEvent
+  
+  RESULTADO: Sistemas desacoplados, fácil de mantener
+  CRITERIO DE ÉXITO: Boss muere → evento → nivel siguiente carga automáticamente
+
+FASE 3: INTERFACES E INTANGIBILIDAD
+  ⏱️ 1 hora
+  ✓ Crear IDamageable.cs
+  ✓ Crear IEnemy.cs
+  ✓ Implementar en EnemyController
+  ✓ Implementar en Boss.cs
+  ✓ Implementar en FinalBoss.cs
+  ✓ Agregar isIntangible a ControlesPersonaje
+  ✓ Chequear isIntangible en enemigos (no atacar)
+  
+  RESULTADO: Dash es defensivo, enemigos respetan intangibilidad
+  CRITERIO DE ÉXITO: Dash durante ataque → enemigo no toca → no recibe daño
+
+FASE 4: CLASE HIERARCHY DE BOSSES
+  ⏱️ 2 horas
+  ✓ Crear BaseBoss.cs (patrón abstracto)
+  ✓ Refactorizar Boss.cs → hereda de BaseBoss
+  ✓ Refactorizar FinalBoss.cs → hereda de BaseBoss
+  ✓ Cada boss implementa: Enter(), Phase1(), Phase2(), OnDefeated()
+  
+  RESULTADO: Bosses consistentes, esencia propia, extensibles
+  CRITERIO DE ÉXITO: Puedes agregar Boss3 sin copy-paste
+
+FASE 5: CLASE HIERARCHY DE ENEMIGOS
+  ⏱️ 2-3 horas
+  ✓ Crear BaseEnemy.cs (extraer lógica común de EnemyController)
+  ✓ Crear BasicEnemy.cs → hereda de BaseEnemy
+  ✓ Crear FastEnemy.cs → hereda, más velocidad, menos vida
+  ✓ Crear StrongEnemy.cs → hereda, más vida, menos velocidad
+  ✓ Crear FlyingEnemy.cs → hereda, diferente física (no gravity)
+  ✓ Actualizar GeneradorNivel para usar prefabs correctos
+  
+  RESULTADO: 4 tipos de enemigos con comportamientos distintos
+  CRITERIO DE ÉXITO: CSV con X, Y, Z, V → cada uno se comporta diferente
+
+FASE 6: UPGRADES PERMANENTES
+  ⏱️ 2 horas
+  ✓ Crear Collectible.cs (base para items)
+  ✓ Crear HealthUpgrade.cs
+  ✓ Crear WeaponUpgrade.cs
+  ✓ Guardar upgrades en SaveData
+  ✓ Cargar upgrades al iniciar nivel
+  ✓ Aplicar stats del upgrade al jugador
+  
+  RESULTADO: Progresión vertical (mejoras permanentes)
+  CRITERIO DE ÉXITO: Tomar upgrade → guardar → cargar → upgrade persiste
+
+FASE 7: AUDIO MANAGER
+  ⏱️ 1-2 horas
+  ✓ Crear AudioManager.cs
+  ✓ Música por zona (nivel 1, 2, 3, etc.)
+  ✓ Música por boss
+  ✓ SFX para acciones (salto, ataque, daño)
+  ✓ Conectar con EventManager
+  
+  RESULTADO: Audio sincronizado, dinámico
+  CRITERIO DE ÉXITO: Cambiar de nivel → música cambia automáticamente
+
+FASE 8: PULIDO Y OPTIMIZACIÓN
+  ⏱️ 2-3 horas
+  ✓ Camera bounds mejorados
+  ✓ Transiciones suaves entre niveles
+  ✓ Logging para debugging
+  ✓ Performance optimization
+  ✓ Testing en múltiples intentos
+  
+  RESULTADO: Juego puliddo, sin bugs visibles
+  CRITERIO DE ÉXITO: Completar todo el juego sin crashes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 NOTAS TÉCNICAS IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SINGLETON PATTERN:
+  GameManager, SaveManager, EventManager usan singleton
+  
+  Implementación segura:
+    public static GameManager Instance { get; private set; }
+    
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+  
+  Ventaja: Accesible desde cualquier lado como GameManager.Instance
+
+HERENCIA VS INTERFAZ:
+  BaseEnemy (herencia) → comparte lógica común (patrullaje, detección)
+  IEnemy (interfaz) → contrato mínimo (TakeDamage, GetHealth)
+  
+  Enemigo implementa: class FastEnemy : BaseEnemy, IEnemy
+
+JSON SERIALIZATION:
+  Usar JsonUtility de Unity (nativo, sin dependencias)
+  
+  Estructura:
+    [System.Serializable]
+    public class SaveData
+    {
+        public int nivelActual;
+        public bool boss1Derrotado;
+        // etc
+    }
+    
+    string json = JsonUtility.ToJson(data, true);
+    File.WriteAllText(path, json);
+
+EVENTOS:
+  Broadcast → Publisher notifica, no sabe quién escucha
+  Subscribe → Listener se registra, se notifica automáticamente
+  
+  Ejemplo:
+    EventManager.Subscribe<BossDefeatedEvent>(HandleBoss);
+    EventManager.Broadcast(new BossDefeatedEvent { bossId = "boss1" });
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎬 PRÓXIMOS PASOS INMEDIATOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRIORIDAD 1 (HOY):
+  → Crear GameManager.cs
+  → Crear SaveManager.cs mejorado
+  → Centralizar SaveData
+  → Refactorizar NewGame.cs, Continue.cs, Finish.cs
+  
+  IMPACTO: Elimina bug crítico de SaveData inconsistente
+
+PRIORIDAD 2 (MAÑANA):
+  → Crear EventManager.cs
+  → Conectar Boss.Die() con evento
+  → GeneradorNivel escucha evento
+  
+  IMPACTO: Acoplamiento débil, fácil de debuggear
+
+PRIORIDAD 3 (DESPUÉS):
+  → Intangibilidad en Dash
+  → Interfaces (IDamageable, IEnemy)
+  → BaseBoss + BasEnemy
+  → Esto ya es refactoring, el juego sigue funcionando
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 CONTACTO CON ARQUITECTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cuando ejecutes código de las FASES:
+  1. Copia exactamente el código sugerido
+  2. Si algo no compila → error specific, reporta
+  3. Si algo no funciona → comportamiento inesperado, reporta
+  4. Siempre consulta este GAMELOG antes de hacer cambios
+  5. Actualiza este GAMELOG con tu progreso
+
+TEMPLATE PARA REPORTES:
+  FASE: [número]
+  ARCHIVO: [nombre]
+  PROBLEMA: [descripción]
+  PASOS: [cómo reproducir]
+  ERROR: [mensaje de consola]
+
+╚════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ LO QUE ESTÁ LISTO (CHECKPOINT 1)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Core/GameManager.cs
+   - SaveData centralizado (una única definición)
+   - CreateNewGame(), SaveGameState(), LoadGameState()
+   - DefeatBoss(), AddUpgrade(), ProgressToNextLevel()
+   - Singleton inicializa al Awake() y persiste entre escenas
+
+✅ Core/EventManager.cs
+   - Sistema de eventos pub/sub completo
+   - 11 eventos predefinidos
+   - BossDefeatedEvent, LevelCompleteEvent, DecisionMadeEvent, etc.
+   - Subscribe/Unsubscribe/Broadcast funcionan
+
+✅ PROXIMO_PASO_FASE1.txt
+   - Instrucciones exactas para refactorizar cada archivo
+   - Pseudo-código de cada cambio
+   - Testing checklist
+   - Errores comunes y soluciones
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 PRÓXIMOS 5 PASOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Verificar que GameManager y EventManager compilen
+   - Buscar en Console: errores o warnings
+   - Si hay: reportar exacto
+
+2. Refactorizar en este orden:
+   a) NewGame.cs → GameManager.CreateNewGame() + DeleteSaveFile()
+   b) Continue.cs → GameManager.HasSaveFile()
+   c) Boss.cs → EventManager.Broadcast(BossDefeatedEvent)
+   d) GeneradorNivel.cs → EventManager.Subscribe() + GameManager.CurrentSave
+   e) Finish.cs → GameManager.ProgressToNextLevel() + Broadcast DecisionMadeEvent
+
+3. Testear después de cada cambio (usar checklist en PROXIMO_PASO_FASE1.txt)
+
+4. Si algo no compila → reportar error exacto
+
+5. Cuando todo compile y funcione → FASE 1 COMPLETADA
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ESTRUCTURA FINAL DE CARPETAS (lo que tendrás cuando FASE 1 termine)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Assets/Scripts/
+├── Core/
+│   ├── GameManager.cs ✅ CREADO
+│   ├── EventManager.cs ✅ CREADO
+│   └── (SaveManager.cs si lo separamos después)
+│
+├── (todos los demás archivos existentes)
+│   ├── ControlesPersonaje.cs (mismo)
+│   ├── GeneradorNivel.cs (REFACTORIZADO ⏳)
+│   ├── Boss.cs (REFACTORIZADO ⏳)
+│   ├── NewGame.cs (REFACTORIZADO ⏳)
+│   ├── Continue.cs (REFACTORIZADO ⏳)
+│   ├── Finish.cs (REFACTORIZADO ⏳)
+│   └── ... resto igual
+
+CAMBIOS FUNCIONALES DESPUÉS DE FASE 1:
+  - SaveData nunca más se pierde (centralizado)
+  - Sistemas desacoplados (usan eventos)
+  - Boss derrotado → evento → siguiente nivel carga automático
+  - Guardado sincronizado siempre
+
+╚════════════════════════════════════════════════════════════════════════════╝
+*/

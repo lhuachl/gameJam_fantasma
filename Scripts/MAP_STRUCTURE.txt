@@ -1,0 +1,320 @@
+════════════════════════════════════════════════════════════════════════════
+                      📁 ESTRUCTURA FINAL ENTREGADA
+════════════════════════════════════════════════════════════════════════════
+
+Assets/Scripts/
+│
+├─📂 Core/
+│  │
+│  ├─ ✅ GameManager.cs (265 líneas)
+│  │   ├─ Singleton(Instance)
+│  │   ├─ CreateNewGame()
+│  │   ├─ SaveGameState()
+│  │   ├─ LoadGameState()
+│  │   ├─ DefeatBoss(string bossId)
+│  │   ├─ ProgressToNextLevel()
+│  │   ├─ MakeLevelDecision(string decision)
+│  │   ├─ AddHealthUpgrade(), AddWeaponUpgrade(), AddSpecialAbility()
+│  │   ├─ GetCurrentLevel(), GetMaxHealth(), GetWeaponDamage()
+│  │   └─ Broadcasts: GameSavedEvent
+│  │
+│  └─ 📝 (SaveManager.cs - integrado en GameManager)
+│
+├─📂 Data/
+│  │
+│  └─ ✅ GameSaveData.cs (55 líneas)
+│     ├─ class GameSaveData
+│     │  ├─ currentLevel: int
+│     │  ├─ completedLevels: List<int>
+│     │  ├─ pendingBoss: bool
+│     │  ├─ decisionsPath: List<string>
+│     │  ├─ goodEndings, badEndings: int
+│     │  ├─ defeatedBosses: Dictionary<string, bool>
+│     │  ├─ maxHealthUpgrades, weaponDamageUpgrades: int
+│     │  ├─ specialAbilities: List<string>
+│     │  ├─ currentHealth, maxHealth, weaponDamage: int
+│     │  ├─ playTime: float
+│     │  └─ ResetToDefaults()
+│     │
+│     └─ class UpgradeConfig
+│        ├─ upgradeId, upgradeDisplayName: string
+│        ├─ healthBonus, damageBonus: int
+│        └─ specialAbility: string
+│
+├─📂 Utilities/
+│  │
+│  ├─📂 Interfaces/
+│  │  │
+│  │  ├─ ✅ IDamageable.cs (20 líneas)
+│  │  │   ├─ TakeDamage(int, Vector2, float): bool
+│  │  │   ├─ GetCurrentHealth(): int
+│  │  │   ├─ GetMaxHealth(): int
+│  │  │   ├─ IsAlive(): bool
+│  │  │   └─ GetPosition(): Vector3
+│  │  │
+│  │  ├─ ✅ IEnemy.cs (20 líneas) : IDamageable
+│  │  │   ├─ GetEnemyType(): char (X, Y, Z, V)
+│  │  │   ├─ CanSeePlayer(): bool
+│  │  │   ├─ AttackPlayer(): void
+│  │  │   └─ IsAttacking(): bool
+│  │  │
+│  │  └─ ✅ IBoss.cs (18 líneas) : IDamageable
+│  │      ├─ GetBossId(): string
+│  │      ├─ EnterBattle(): void
+│  │      ├─ ExitBattle(): void
+│  │      └─ GetCurrentPhase(): int
+│  │
+│  └─📂 Events/
+│     │
+│     ├─ ✅ GameEvents.cs (110 líneas)
+│     │  └─ Clases derivadas de abstract GameEvent:
+│     │     ├─ BossDefeatedEvent (bossId, levelNumber)
+│     │     ├─ LevelCompleteEvent (levelNumber)
+│     │     ├─ DecisionMadeEvent (chosenPath, levelNumber)
+│     │     ├─ GameSavedEvent (saveLocation)
+│     │     ├─ PlayerTakeDamageEvent (damageAmount, health, position)
+│     │     ├─ PlayerDiedEvent (lastLevel, deathPosition)
+│     │     ├─ PlayerTookUpgradeEvent (upgradeId, upgradeConfig)
+│     │     ├─ PlayerJumpedEvent (jumpPosition)
+│     │     ├─ PlayerDashedEvent (startPos, endPos, isIntangible)
+│     │     ├─ PlayerAttackedEvent (attackPosition, damageDealt)
+│     │     ├─ EnemyDefeatedEvent (enemyType, deathPosition)
+│     │     ├─ EnemySpawnedEvent (enemyType, spawnPosition)
+│     │     ├─ LevelLoadedEvent (levelNumber, levelName)
+│     │     ├─ LevelUnloadingEvent (currentLevel)
+│     │     ├─ MusicChangeRequestedEvent (musicClipName, fadeDuration)
+│     │     └─ SFXPlayRequestedEvent (sfxClipName, playPosition)
+│     │
+│     └─ ✅ EventManager.cs (95 líneas)
+│        └─ Sistema Pub/Sub estático:
+│           ├─ Subscribe<T>(Action<T>): void
+│           ├─ Unsubscribe<T>(Action<T>): void
+│           ├─ Broadcast<T>(T): void
+│           ├─ ClearAllSubscribers(): void
+│           └─ DebugPrintSubscribers(): void
+│
+├─📂 Entities/
+│  │
+│  ├─📂 Player/
+│  │  │
+│  │  ├─ ✅ PlayerController.cs (350 líneas) : MonoBehaviour, IDamageable
+│  │  │   ├─ Input System setup en código (Move, Jump, Dash, Attack)
+│  │  │   ├─ Movimiento suave
+│  │  │   ├─ Salto con validación ground
+│  │  │   ├─ Dash intangible (desactiva collider)
+│  │  │   ├─ Ataque detecta enemigos en rango
+│  │  │   ├─ TakeDamage() respeta intangibilidad
+│  │  │   ├─ Die() cuando health <= 0
+│  │  │   ├─ isIntangible, isDashing, isGrounded properties
+│  │  │   ├─ Flip() para animación de dirección
+│  │  │   └─ Broadcasts: Jump, Dash, Attack, TakeDamage, Die
+│  │  │
+│  │  └─ 📝 (PlayerUpgrade.cs - CREAR PRÓXIMA FASE)
+│  │
+│  ├─📂 Enemy/
+│  │  │
+│  │  ├─📂 Base/
+│  │  │  │
+│  │  │  ├─ 📝 BaseEnemy.cs (CREAR)
+│  │  │  │   ├─ : MonoBehaviour, IEnemy
+│  │  │  │   ├─ Patrullaje común
+│  │  │  │   ├─ Detección de jugador
+│  │  │  │   ├─ Attack() con cooldown
+│  │  │  │   ├─ virtual OnPhaseChanged(), OnAttack(), etc.
+│  │  │  │   └─ Broadcasts: EnemyDefeated
+│  │  │  │
+│  │  │  └─ 📝 BaseEnemyConfig.cs (CREAR SCRIPTABLE)
+│  │  │
+│  │  └─📂 Types/
+│  │     │
+│  │     ├─ 📝 BasicEnemy.cs (CREAR tipo X)
+│  │     │   └─ : BaseEnemy
+│  │     │      └─ Enemigo estándar, patrullaje simple
+│  │     │
+│  │     ├─ 📝 FastEnemy.cs (CREAR tipo Y)
+│  │     │   └─ : BaseEnemy
+│  │     │      ├─ moveSpeed *= 1.5f
+│  │     │      ├─ maxHealth /= 1.5f
+│  │     │      ├─ visionRange *= 1.2f
+│  │     │      └─ AttackCooldown /= 1.2f
+│  │     │
+│  │     ├─ 📝 StrongEnemy.cs (CREAR tipo Z)
+│  │     │   └─ : BaseEnemy
+│  │     │      ├─ moveSpeed *= 0.7f
+│  │     │      ├─ maxHealth *= 1.5f
+│  │     │      ├─ attackDamage *= 1.5f
+│  │     │      └─ knockbackForce *= 1.5f
+│  │     │
+│  │     └─ 📝 FlyingEnemy.cs (CREAR tipo V)
+│  │         └─ : BaseEnemy
+│  │            ├─ Sin gravedad (rb.gravityScale = 0)
+│  │            ├─ Patrón de vuelo diferente
+│  │            ├─ Evade jugador en lugar de frontal
+│  │            └─ moveSpeed ligeramente reducido
+│  │
+│  └─📂 Boss/
+│     │
+│     ├─ 📝 BaseBoss.cs (CREAR)
+│     │   ├─ : MonoBehaviour, IBoss
+│     │   ├─ State machine (Waiting, Phase1, Phase2, Phase3, Defeated)
+│     │   ├─ currentPhase: int
+│     │   ├─ Phase management
+│     │   ├─ Knockback resistance
+│     │   ├─ PhaseTransition()
+│     │   ├─ virtual AttackPattern(), OnPhaseChanged()
+│     │   ├─ Die() broadcasts BossDefeatedEvent
+│     │   └─ Health bar integration
+│     │
+│     ├─ 📝 Boss1.cs (CREAR)
+│     │   ├─ : BaseBoss
+│     │   ├─ Ataques: FireballAttack, ComboAttack, GroundSlam
+│     │   ├─ 3 fases con transiciones visuales
+│     │   └─ Única esencia/comportamiento
+│     │
+│     ├─ 📝 Boss2.cs (CREAR)
+│     │   ├─ : BaseBoss
+│     │   ├─ Ataques diferentes a Boss1
+│     │   ├─ Mecánica diferente (ej: invulnerabilidad temporal)
+│     │   └─ Otra esencia/comportamiento
+│     │
+│     └─ ⚠️ FinalBoss.cs (REFACTORIZAR → BaseBoss)
+│        ├─ Última pelea
+│        ├─ Combinación de ataques previos
+│        └─ 4+ fases
+│
+├─📂 Managers/
+│  │
+│  ├─ ✅ CameraManager.cs (35 líneas)
+│  │   ├─ : MonoBehaviour
+│  │   ├─ target: Transform
+│  │   ├─ offset: Vector3
+│  │   ├─ smoothSpeed: float
+│  │   ├─ lockX, lockY: bool
+│  │   ├─ LateUpdate() sigue suavemente
+│  │   └─ Auto-busca PlayerController si no asignado
+│  │
+│  ├─ 📝 LevelManager.cs (CREAR refactorizando GeneradorNivel)
+│  │   ├─ : MonoBehaviour
+│  │   ├─ Carga CSV de niveles
+│  │   ├─ Instancia prefabs (paredes, enemigos)
+│  │   ├─ Posiciona jugador y boss
+│  │   ├─ OnBossDefeated() event handler
+│  │   ├─ Desbloquea puerta final
+│  │   ├─ Broadcasts: LevelLoaded
+│  │   └─ Usa GameManager.GetCurrentLevel()
+│  │
+│  ├─ 📝 AudioManager.cs (CREAR PRÓXIMA FASE)
+│  │   ├─ : MonoBehaviour, Singleton
+│  │   ├─ Música por zona
+│  │   ├─ Música por boss
+│  │   ├─ SFX para eventos
+│  │   ├─ Crossfade entre temas
+│  │   └─ Escucha: MusicChangeRequestedEvent, SFXPlayRequestedEvent
+│  │
+│  └─ 📝 InputManager.cs (OPCIONAL - si se centraliza)
+│     └─ Podría estar en PlayerController por ahora
+│
+├─📂 Level/
+│  │
+│  ├─ 📝 LevelTransition.cs (CREAR)
+│  │   ├─ : MonoBehaviour
+│  │   ├─ Fade in/out between scenes
+│  │   ├─ Cinematic playback
+│  │   ├─ Decision UI (BUENO/MALO buttons)
+│  │   ├─ OnDecisionMade(string decision)
+│  │   └─ Usa GameManager.MakeLevelDecision()
+│  │
+│  ├─ ⚠️ Finish.cs (REFACTORIZAR)
+│  │   ├─ OnTriggerEnter2D() broadcast LevelCompleteEvent
+│  │   ├─ Llama a LevelTransition.Show()
+│  │   └─ Limpia handlers
+│  │
+│  └─ 📁 (CSVs y level data - en Resources/Levels/)
+│
+├─📂 UI/
+│  │
+│  ├─ 📝 MenuManager.cs (CREAR consolidando NewGame + Continue)
+│  │   ├─ : MonoBehaviour
+│  │   ├─ OnNewGameClicked()
+│  │   │  └─ GameManager.CreateNewGame() → LoadScene("Level_1")
+│  │   │
+│  │   ├─ OnContinueClicked()
+│  │   │  └─ GameManager.LoadGameState() → LoadScene("Level_X")
+│  │   │
+│  │   └─ UI buttons wired a métodos
+│  │
+│  ├─ 📝 HUDManager.cs (CREAR)
+│  │   ├─ : MonoBehaviour
+│  │   ├─ Muestra health bar
+│  │   ├─ Muestra upgrades recolectados
+│  │   ├─ Escucha PlayerTakeDamageEvent
+│  │   ├─ Escucha PlayerTookUpgradeEvent
+│  │   └─ UpdateUI()
+│  │
+│  └─ 📝 PauseManager.cs (CREAR si se necesita)
+│     ├─ : MonoBehaviour
+│     ├─ Time.timeScale = 0 / 1
+│     └─ Menú de pausa
+│
+└─📂 Legacy/ (REMOVER DESPUÉS DE REFACTORIZAR)
+   │
+   ├─ ⚠️ ControlesPersonaje.cs (REEMPLAZADO → PlayerController)
+   ├─ ⚠️ CameraFollowplayer.cs (REEMPLAZADO → CameraManager)
+   ├─ ⚠️ GeneradorNivel.cs (REFACTORIZAR → LevelManager)
+   ├─ ⚠️ EnemyController.cs (REEMPLAZAR → BaseEnemy + Types)
+   ├─ ⚠️ Boss.cs (REFACTORIZAR → BaseBoss + Boss1)
+   ├─ ⚠️ FinalBoss.cs (REFACTORIZAR → BaseBoss + FinalBoss)
+   ├─ ⚠️ NewGame.cs (CONSOLIDAR → MenuManager)
+   ├─ ⚠️ Continue.cs (CONSOLIDAR → MenuManager)
+   ├─ ⚠️ Finish.cs (REFACTORIZAR → LevelTransition + Finish)
+   ├─ ⚠️ Guardadodepartida.cs (OBSOLETO)
+   ├─ ⚠️ Pinchos.cs (REVISAR si se necesita)
+   ├─ ⚠️ BackgroundParallaxFill.cs (REVISAR si se necesita)
+   ├─ ⚠️ BulletScript.cs (REVISAR si se necesita)
+   ├─ ⚠️ ParalaxController.cs (REVISAR si se necesita)
+   ├─ ⚠️ TilemapSetup.cs (REVISAR si se necesita)
+   └─ [Y otros .meta files]
+
+
+════════════════════════════════════════════════════════════════════════════
+📊 LEYENDA
+════════════════════════════════════════════════════════════════════════════
+
+✅ = Creado y listo para producción
+📝 = Pendiente crear (detallado cómo hacerlo)
+⚠️ = Pendiente refactorizar (preservar lógica existente)
+📂 = Carpeta (vacía o con submódulos)
+📁 = Recursos externos
+
+
+════════════════════════════════════════════════════════════════════════════
+🚀 PRÓXIMOS PASOS
+════════════════════════════════════════════════════════════════════════════
+
+HOY:
+  1. Agregar GameManager y EventManager a tu escena principal
+  2. Reemplazar PlayerController por el nuevo
+  3. Agregar CameraManager
+  4. Verificar que compila sin errores
+
+ESTA SEMANA:
+  5. Refactorizar LevelManager (GeneradorNivel.cs)
+  6. Refactorizar MenuManager (NewGame + Continue)
+  7. Agregar broadcasts en Boss.cs y Finish.cs
+  8. Probar que juego es completamente funcional
+
+PRÓXIMA SEMANA:
+  9. BaseEnemy + 4 tipos
+  10. BaseBoss + Boss1, Boss2, FinalBoss
+  11. AudioManager
+  12. HUDManager
+  13. Polish final
+
+════════════════════════════════════════════════════════════════════════════
+
+📄 Archivos de Documentación:
+  - COMIENZA_AQUI.txt (¿Qué hacer primero?)
+  - ARQUITECTURA_BRUTAL.txt (Detalles técnicos)
+  - RESUMEN_ENTREGA.txt (Lo que recibiste)
+
+╚════════════════════════════════════════════════════════════════════════════╝
