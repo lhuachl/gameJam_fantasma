@@ -1,59 +1,63 @@
-# 🏗️ Arquitectura Técnica - Game Jam Fantasma
+# 🏗️ Cómo está armado el juego (más o menos)
 
-## Resumen Ejecutivo
+## TL;DR
 
-Este documento describe la arquitectura técnica del juego Game Jam Fantasma, un plataformero 2D desarrollado en Unity con C#. El proyecto fue diseñado siguiendo principios de ingeniería de software profesional, incluyendo patrones de diseño, separación de responsabilidades, y código limpio.
-
-**Arquitectos Principales:** Alex (Lead) y Saul (Senior Developer)
+Usamos Unity. Hicimos Singletons porque los tutoriales lo recomiendan. Hay un sistema de eventos que la verdad ayudó mucho. Y si, hay una carpeta "Legacy" que mejor no abrir.
 
 ---
 
-## Índice
+## Índice (por si te interesa)
 
-1. [Visión General](#visión-general)
-2. [Patrones de Diseño](#patrones-de-diseño)
-3. [Arquitectura de Capas](#arquitectura-de-capas)
-4. [Sistemas Principales](#sistemas-principales)
-5. [Flujo de Datos](#flujo-de-datos)
-6. [Interfaces y Abstracciones](#interfaces-y-abstracciones)
-7. [Sistema de Eventos](#sistema-de-eventos)
-8. [Persistencia de Datos](#persistencia-de-datos)
-9. [Organización del Código](#organización-del-código)
-10. [Decisiones Arquitectónicas](#decisiones-arquitectónicas)
+1. [Lo Básico](#lo-básico)
+2. [Patrones que usamos](#patrones-que-usamos)
+3. [Los Sistemas Principales](#los-sistemas-principales)
+4. [Cómo se comunican las cosas](#cómo-se-comunican-las-cosas)
+5. [Las Interfaces](#las-interfaces)
+6. [El Sistema de Guardado](#el-sistema-de-guardado)
+7. [Organización del Código](#organización-del-código)
+8. [Por qué hicimos lo que hicimos](#por-qué-hicimos-lo-que-hicimos)
 
 ---
 
-## Visión General
+## Lo Básico
 
-### Principios Arquitectónicos
+### Los "Principios" que seguimos
 
-La arquitectura del juego se basa en 5 pilares fundamentales:
+Intentamos hacer las cosas bien:
 
-1. **Centralización de Estado** - Una única fuente de verdad (GameManager)
-2. **Comunicación Desacoplada** - Eventos Pub/Sub (EventManager)
-3. **Abstracción y Reutilización** - Interfaces y clases base
-4. **Persistencia Unificada** - Un solo archivo de guardado (JSON)
-5. **Organización Modular** - Carpetas por responsabilidad
+1. **GameManager centralizado** - Todo el estado del juego en un lugar
+2. **Sistema de eventos** - Para que las cosas no dependan directamente unas de otras
+3. **Interfaces** - Para que el código sea reutilizable (o eso dijeron)
+4. **JSON para guardar** - Porque es fácil de debuggear
+5. **Carpetas organizadas** - Para no perder los archivos
 
-### Características Clave
+### Qué salió bien
 
-✅ **Escalable** - Fácil agregar nuevas features sin modificar código existente  
-✅ **Mantenible** - Bugs localizados en componentes específicos  
-✅ **Testeable** - Interfaces facilitan testing y mocking  
-✅ **Performante** - Optimizado para 60 FPS en hardware medio  
-✅ **Documentado** - Código y arquitectura completamente documentados  
+✅ El juego funciona  
+✅ No hay (muchos) bugs  
+✅ El código está organizado  
+✅ Podemos agregar features sin romper todo  
+✅ El sistema de eventos fue una gran idea
+
+### Qué no salió tan bien
+
+❌ Hay código duplicado en algunos lados  
+❌ La carpeta "Legacy" tiene cosas raras  
+❌ Algunos scripts son muy largos  
+❌ No todo está perfectamente optimizado  
+❌ Hay TODOs que nunca se hicieron
 
 ---
 
-## Patrones de Diseño
+## Patrones que usamos
 
-### 1. Singleton Pattern
+### 1. Singleton (GameManager)
 
-**Aplicado en:** GameManager  
-**Propósito:** Garantizar una única instancia de estado global  
-**Desarrollador:** Alex
+**Por qué:** Necesitábamos una forma fácil de acceder al estado del juego desde cualquier lado.
 
+**Cómo funciona:**
 ```csharp
+// Código simplificado
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
@@ -65,11 +69,6 @@ public class GameManager : MonoBehaviour
             if (_instance == null)
             {
                 _instance = FindObjectOfType<GameManager>();
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("GameManager");
-                    _instance = go.AddComponent<GameManager>();
-                }
             }
             return _instance;
         }
@@ -89,445 +88,283 @@ public class GameManager : MonoBehaviour
 ```
 
 **Ventajas:**
-- Acceso global al estado del juego
-- Persiste entre escenas con DontDestroyOnLoad
-- Thread-safe en contexto de Unity
-- Fácil acceso desde cualquier script
+- Fácil de usar desde cualquier script
+- Persiste entre escenas
+- Una sola instancia garantizada
 
-### 2. Observer Pattern (Pub/Sub)
+**Desventajas:**
+- Es un "anti-pattern" según algunos
+- Dificulta el testing (no nos importó mucho)
+- Puede volverse un "god object"
 
-**Aplicado en:** EventManager  
-**Propósito:** Comunicación desacoplada entre sistemas  
-**Desarrollador:** Alex
+### 2. Pub/Sub (EventManager)
 
+**Por qué:** Para que los scripts no se llamen directamente entre sí.
+
+**Ejemplo:**
 ```csharp
-public static class EventManager
+// Publicar un evento
+EventManager.Broadcast(new EnemyDefeatedEvent { enemyType = 'X' });
+
+// Suscribirse a un evento
+EventManager.Subscribe<EnemyDefeatedEvent>(OnEnemyDefeated);
+
+// Handler
+private void OnEnemyDefeated(EnemyDefeatedEvent eventData)
 {
-    private static Dictionary<Type, List<Delegate>> _eventDictionary 
-        = new Dictionary<Type, List<Delegate>>();
-    
-    public static void Subscribe<T>(Action<T> handler) where T : struct
-    {
-        Type eventType = typeof(T);
-        if (!_eventDictionary.ContainsKey(eventType))
-        {
-            _eventDictionary[eventType] = new List<Delegate>();
-        }
-        _eventDictionary[eventType].Add(handler);
-    }
-    
-    public static void Broadcast<T>(T eventData) where T : struct
-    {
-        Type eventType = typeof(T);
-        if (_eventDictionary.ContainsKey(eventType))
-        {
-            foreach (var handler in _eventDictionary[eventType])
-            {
-                ((Action<T>)handler).Invoke(eventData);
-            }
-        }
-    }
+    Debug.Log("Enemigo derrotado!");
+    // Hacer algo...
 }
 ```
 
 **Ventajas:**
-- Sistemas no necesitan conocerse entre sí
+- Los sistemas no se conocen entre sí
 - Fácil agregar nuevos listeners
-- Reducción de acoplamiento de 100%
-- Debug mode para tracking de eventos
+- El código es más limpio
 
-### 3. Template Method Pattern
+**Por qué funcionó:**
+- Eliminó como 30 FindObjectOfType() en Updates
+- Podíamos agregar features sin tocar código existente
+- Debugging fue más fácil
 
-**Aplicado en:** BaseEnemy  
-**Propósito:** Definir estructura común para todos los enemigos  
-**Desarrollador:** Saul
+### 3. Herencia (BaseEnemy)
+
+**Por qué:** Todos los enemigos comparten lógica común.
 
 ```csharp
+// Clase base
 public abstract class BaseEnemy : MonoBehaviour, IEnemy, IDamageable
 {
-    // Métodos template que subclases deben implementar
+    // Lógica común
+    protected void CheckForEdge() { ... }
+    protected void Flip() { ... }
+    public bool TakeDamage(int damage, ...) { ... }
+    
+    // Cada enemigo implementa esto diferente
     protected abstract void UpdateAI();
-    protected abstract void PerformAttack();
-    
-    // Lógica común para todos los enemigos
-    protected void Update()
+}
+
+// Enemigo específico
+public class PatrolEnemy : BaseEnemy
+{
+    protected override void UpdateAI()
     {
-        if (!isAlive) return;
-        
-        UpdateAI();        // Comportamiento específico
-        CheckPlayer();     // Común
-        HandleMovement();  // Común
-        UpdateAnimation(); // Común
-    }
-    
-    // Método común implementado una vez
-    public bool TakeDamage(int damage, Vector2 knockback, float force)
-    {
-        currentHealth -= damage;
-        ApplyKnockback(knockback, force);
-        if (currentHealth <= 0)
-        {
-            Die();
-            return true;
-        }
-        return false;
+        // Comportamiento de patrulla
     }
 }
 ```
 
-**Ventajas:**
-- Código común escrito una sola vez
-- Subclases solo implementan lo diferente
-- Fácil crear nuevos tipos de enemigos
-- Garantiza consistencia de comportamiento
-
-### 4. Strategy Pattern
-
-**Aplicado en:** Sistema de IA de enemigos  
-**Propósito:** Diferentes comportamientos de enemigos intercambiables  
-**Desarrollador:** Saul
-
-Diferentes estrategias de movimiento:
-- `PatrolEnemy` - Estrategia de patrullaje
-- `ChaseEnemy` - Estrategia de persecución
-- Ambas heredan de `BaseEnemy` pero implementan `UpdateAI()` diferente
+**Qué aprendimos:**
+- Herencia es útil cuando hay comportamiento compartido
+- Pero no abuses de ella
+- A veces composición es mejor (no tuvimos tiempo)
 
 ---
 
-## Arquitectura de Capas
+## Los Sistemas Principales
 
-```
-┌─────────────────────────────────────────┐
-│         PRESENTATION LAYER              │
-│  (UI, HUD, Menus, Visual Effects)       │
-└─────────────────────────────────────────┘
-                   ↓
-┌─────────────────────────────────────────┐
-│         APPLICATION LAYER               │
-│  (GameManager, EventManager, Managers)  │
-└─────────────────────────────────────────┘
-                   ↓
-┌─────────────────────────────────────────┐
-│         DOMAIN LAYER                    │
-│  (Entities, Logic, Interfaces)          │
-│  Player, Enemies, Bosses                │
-└─────────────────────────────────────────┘
-                   ↓
-┌─────────────────────────────────────────┐
-│         DATA LAYER                      │
-│  (GameSaveData, Persistence, JSON)      │
-└─────────────────────────────────────────┘
-```
+### 1. GameManager
 
-### Separación de Responsabilidades
+**Qué hace:** Guarda todo el estado del juego
 
-**Presentation Layer:**
-- Renderizado visual
-- Animaciones
-- UI/HUD
-- Efectos de partículas
-- *No contiene lógica de negocio*
+**Responsabilidades:**
+- Nivel actual
+- Vida del jugador
+- Decisiones tomadas
+- Bosses derrotados
+- Upgrades desbloqueados
+- Guardar/Cargar progreso
 
-**Application Layer:**
-- Coordinación de sistemas
-- Gestión de estado global
-- Comunicación entre sistemas
-- Managers especializados
-- *Orquesta pero no implementa lógica de dominio*
-
-**Domain Layer:**
-- Lógica del juego (gameplay)
-- Entidades (Player, Enemy, Boss)
-- Mecánicas (combate, movimiento)
-- Reglas de negocio
-- *Core del juego*
-
-**Data Layer:**
-- Serialización/Deserialización
-- Persistencia en disco
-- Gestión de archivos
-- *Solo datos, sin lógica*
-
----
-
-## Sistemas Principales
-
-### 1. GameManager (Core)
-
-**Responsabilidad:** Estado global y progresión  
-**Desarrollador:** Alex  
-**Líneas de código:** ~350
-
-**Funcionalidades:**
-- Mantener estado actual del juego
-- Guardar/cargar progreso automáticamente
-- Gestionar progresión entre niveles
-- Trackear decisiones BUENO/MALO
-- Gestionar upgrades permanentes
-- Trackear bosses derrotados
-
-**Métodos Públicos:**
+**Métodos importantes:**
 ```csharp
-public void CreateNewGame()
-public void SaveGameState()
-public void LoadGameState()
-public void ProgressToNextLevel()
-public void DefeatBoss(string bossId)
-public void MakeDecision(bool isGoodChoice)
-public void AddHealthUpgrade(int amount)
-public void AddWeaponUpgrade(int damage)
-public void UnlockAbility(string abilityName)
-public int GetCurrentLevel()
-public GameSaveData GetCurrentSaveData()
+GameManager.Instance.SaveGameState();        // Guarda todo
+GameManager.Instance.LoadGameState();         // Carga todo
+GameManager.Instance.ProgressToNextLevel();  // Siguiente nivel
+GameManager.Instance.DefeatBoss("boss1");    // Boss derrotado
 ```
 
-**Integración:**
-- Escucha eventos: `LevelCompleteEvent`, `BossDefeatedEvent`, `DecisionMadeEvent`
-- Emite eventos: `LevelLoadedEvent`, `GameLoadedEvent`, `GameSavedEvent`
+**Problemas que tuvimos:**
+- Al principio guardábamos cosas en múltiples lugares (mal)
+- Alex lo centralizó todo aquí (bien)
+- Ahora funciona (yay)
 
-### 2. EventManager (Core)
+### 2. EventManager
 
-**Responsabilidad:** Comunicación desacoplada  
-**Desarrollador:** Alex  
-**Líneas de código:** ~200
+**Qué hace:** Permite que los scripts se comuniquen sin conocerse
 
-**Funcionalidades:**
-- Registro de listeners por tipo de evento
-- Broadcasting de eventos a todos los listeners
-- Desuscripción de listeners
-- Debug logging de eventos
+**Eventos que tenemos:**
+1. BossDefeatedEvent
+2. LevelCompleteEvent  
+3. PlayerTakeDamageEvent
+4. PlayerDiedEvent
+5. EnemyDefeatedEvent
+6. Y como 8 más...
 
-**Métodos Públicos:**
+**Ejemplo de uso:**
 ```csharp
-public static void Subscribe<T>(Action<T> handler) where T : struct
-public static void Unsubscribe<T>(Action<T> handler) where T : struct
-public static void Broadcast<T>(T eventData) where T : struct
-public static void ClearAllSubscriptions()
+// En Boss.cs cuando muere
+EventManager.Broadcast(new BossDefeatedEvent 
+{ 
+    bossId = "boss1",
+    levelNumber = 3 
+});
+
+// En GameManager escuchando
+void Start()
+{
+    EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
+}
+
+void OnBossDefeated(BossDefeatedEvent data)
+{
+    Debug.Log($"Boss {data.bossId} derrotado!");
+    saveData.defeatedBosses[data.bossId] = true;
+    SaveGameState();
+}
 ```
 
-**Eventos del Sistema (13 tipos):**
-1. `BossDefeatedEvent` - Boss derrotado
-2. `LevelCompleteEvent` - Nivel completado
-3. `DecisionMadeEvent` - Decisión tomada
-4. `PlayerTakeDamageEvent` - Jugador recibe daño
-5. `PlayerDiedEvent` - Jugador muere
-6. `PlayerTookUpgradeEvent` - Jugador recoge upgrade
-7. `PlayerJumpedEvent` - Jugador salta
-8. `PlayerDashedEvent` - Jugador hace dash
-9. `PlayerAttackedEvent` - Jugador ataca
-10. `EnemyDefeatedEvent` - Enemigo derrotado
-11. `EnemySpawnedEvent` - Enemigo spawneado
-12. `LevelLoadedEvent` - Nivel cargado
-13. `LevelUnloadingEvent` - Nivel descargando
+### 3. PlayerController
 
-### 3. PlayerController (Entities)
+**Qué hace:** Controla al jugador (obvio)
 
-**Responsabilidad:** Control del jugador  
-**Desarrollador:** Alex  
-**Líneas de código:** ~350
+**Mecánicas:**
+- Movimiento (WASD)
+- Salto (Space)
+- Dash (Shift) - con invulnerabilidad!
+- Ataque (clic o P)
 
-**Mecánicas Implementadas:**
-- Movimiento horizontal (WASD)
-- Salto con detección de suelo
-- Dash intangible (0.2s invulnerabilidad)
-- Sistema de ataque
-- Sistema de salud
-- Muerte y respawn
+**Código importante:**
+```csharp
+// El dash hace intangible al jugador
+if (isDashing)
+{
+    // Jugador no puede recibir daño
+    return false;
+}
+```
 
-**Estados:**
-- Idle
-- Running
-- Jumping
-- Dashing (intangible)
-- Attacking
-- TakingDamage
-- Dead
+**Evolución:**
+- Versión 1: Movimiento básico
+- Versión 2: Agregamos salto mejorado
+- Versión 3: Dash intangible (después de muchos bugs)
+- Versión 4: Refactor para usar eventos
+- Versión actual: Funciona bien
 
-**Integración:**
-- Implementa: `IDamageable`
-- Emite: `PlayerJumpedEvent`, `PlayerDashedEvent`, `PlayerAttackedEvent`, `PlayerTakeDamageEvent`, `PlayerDiedEvent`
-- Escucha: `LevelLoadedEvent` (para spawn inicial)
+### 4. Sistema de Enemigos
 
-### 4. BaseEnemy (Entities)
+**BaseEnemy** - La clase base
 
-**Responsabilidad:** Lógica común de enemigos  
-**Desarrollador:** Saul  
-**Líneas de código:** ~200
-
-**Funcionalidades Comunes:**
-- Detección de bordes de plataformas
+Tiene la lógica que todos comparten:
+- Detección de bordes (para no caerse)
 - Detección de paredes
 - Sistema de flip del sprite
-- Sistema de salud
-- Muerte y drop de items
+- TakeDamage
+- Die()
 
-**Métodos Abstractos (para subclases):**
+**PatrolEnemy** - El enemigo que patrulla
+
 ```csharp
-protected abstract void UpdateAI();
-protected abstract void PerformAttack();
-```
-
-**Métodos Comunes:**
-```csharp
-protected void CheckForEdge()
-protected void CheckForWall()
-protected void Flip()
-public bool TakeDamage(int damage, Vector2 knockback, float force)
-protected void Die()
-```
-
-### 5. Enemigos Específicos
-
-#### PatrolEnemy
-**Desarrollador:** Saul  
-**Comportamiento:** Patrulla entre dos puntos sin caer de plataformas
-
-**IA:**
-```
-1. Mover en dirección actual
-2. Raycast hacia abajo para detectar edge
-3. Si edge detected → Flip() y cambiar dirección
-4. Si wall detected → Flip() y cambiar dirección
-5. Wait en puntos extremos (configurable)
-```
-
-#### ChaseEnemy
-**Desarrollador:** Saul  
-**Comportamiento:** Persigue jugador cuando está en rango
-
-**Estados IA:**
-- **Idle:** Wander aleatorio
-- **Chase:** Persigue jugador a velocidad aumentada
-- **Attack:** Ataca cuando está en rango
-
-**IA:**
-```
-1. Raycast hacia jugador
-2. Si player en vision range → Estado Chase
-3. Si player fuera de range → Estado Idle
-4. Si player en attack range → PerformAttack()
-```
-
-### 6. BackgroundManager (Managers)
-
-**Responsabilidad:** Sistema de parallax multicapa  
-**Desarrollador:** Saul  
-**Líneas de código:** ~280
-
-**Funcionalidades:**
-- Parallax multicapa (hasta 10 capas)
-- Infinite tiling horizontal
-- Escala automática a resolución objetivo
-- Parallax factors configurables
-- Follow camera optional en Y
-
-**Configuración por Capa:**
-```csharp
-[Serializable]
-public class ParallaxLayer
+// Pseudocódigo
+void UpdateAI()
 {
-    public GameObject backgroundObject;
-    public float parallaxFactor;  // 0.0 - 1.0
-    public float zDepth;          // -10 a -50
-    public bool infiniteTilingX;
-    public bool followCameraY;
+    Mover en dirección actual
+    
+    if (detecta borde)
+        Voltear
+        
+    if (detecta pared)
+        Voltear
 }
 ```
 
-**Algoritmo de Parallax:**
+El truco fue hacer que detecte el borde ANTES de caerse. Tardamos como un día en lograr eso.
+
+**ChaseEnemy** - El que te persigue
+
+Tiene 3 estados:
+- Idle: Anda random
+- Chase: Te persigue si te ve
+- Attack: Te ataca si está cerca
+
+### 5. Sistema de Parallax
+
+**BackgroundManager** - Por Saul
+
+Características:
+- Múltiples capas de fondo
+- Cada capa se mueve a diferente velocidad
+- Infinite scrolling (se repite sin que se note)
+- Escala automática a 1920x1080
+
+**Cómo funciona:**
 ```
-1. Calcular movimiento de cámara desde frame anterior
-2. Para cada capa:
-   a. newPos = currentPos + (cameraMovement * parallaxFactor)
-   b. Aplicar newPos a background
-   c. Si infiniteTilingX enabled:
-      - Verificar si necesita wrap around
-      - Instantiar/destruir tiles según necesidad
+Capa lejana: se mueve lento (parallax factor 0.2)
+Capa media: se mueve medio (parallax factor 0.5)
+Capa cercana: se mueve rápido (parallax factor 0.8)
 ```
 
-### 7. CameraManager (Managers)
+Esto da sensación de profundidad. Quedó bien.
 
-**Responsabilidad:** Control de cámara  
-**Desarrollador:** Alex  
-**Líneas de código:** ~150
+### 6. CameraManager
 
-**Funcionalidades:**
-- Seguimiento suave del jugador (smoothing)
-- Camera boundaries (min/max X y Y)
+**Qué hace:** La cámara sigue al jugador suavemente
+
+**Features:**
+- Smoothing (no se mueve instantáneo)
+- Boundaries (no sale del mapa)
 - Offset configurable
-- Lock opcional en ejes
+
+Código simple pero efectivo.
 
 ---
 
-## Flujo de Datos
+## Cómo se comunican las cosas
 
-### Flujo de Gameplay Típico
-
-```
-1. Usuario presiona tecla de movimiento
-   ↓
-2. Input System captura input
-   ↓
-3. PlayerController.Update() procesa input
-   ↓
-4. PlayerController mueve Rigidbody2D
-   ↓
-5. PlayerController emite PlayerMovedEvent (si configurado)
-   ↓
-6. CameraManager escucha evento y actualiza posición
-   ↓
-7. BackgroundManager escucha movimiento de cámara y actualiza parallax
-```
-
-### Flujo de Combate
+### Flujo típico de gameplay
 
 ```
-1. Jugador presiona tecla de ataque (P)
+1. Jugador presiona tecla
    ↓
-2. PlayerController.PerformAttack()
+2. PlayerController lo procesa
    ↓
-3. CircleCollider2D detecta enemigos en rango
+3. Se mueve el Rigidbody2D
    ↓
-4. Para cada enemigo detectado:
-   a. enemigo.TakeDamage(damage, knockback, force)
-   b. Si enemigo muere → EventManager.Broadcast(EnemyDefeatedEvent)
+4. (Opcionalmente) Se emite un evento
    ↓
-5. HUDManager escucha EnemyDefeatedEvent y actualiza score
-   ↓
-6. LevelManager escucha y verifica si todos los enemigos están muertos
+5. Otros sistemas escuchan y reaccionan
 ```
 
-### Flujo de Guardado
+### Ejemplo: Derrotar un enemigo
 
 ```
-1. Evento significativo ocurre (boss derrotado, nivel completado)
+1. Jugador ataca
    ↓
-2. EventManager broadcast evento específico
+2. PlayerController detecta colisión
    ↓
-3. GameManager escucha evento
+3. enemy.TakeDamage(10, knockback, force)
    ↓
-4. GameManager actualiza GameSaveData internamente
+4. Enemigo muere
    ↓
-5. GameManager.SaveGameState() serializa a JSON
+5. EventManager.Broadcast(EnemyDefeatedEvent)
    ↓
-6. File.WriteAllText(path, json)
-   ↓
-7. GameManager emite GameSavedEvent
+6. HUDManager actualiza score (si lo escucha)
+7. LevelManager verifica si quedan enemigos (si lo escucha)
 ```
+
+Sin eventos, tendríamos que hacer FindObjectOfType en cada paso. Eso es lento y feo.
 
 ---
 
-## Interfaces y Abstracciones
+## Las Interfaces
 
 ### IDamageable
 
-**Propósito:** Contrato para entidades que pueden recibir daño  
-**Desarrollador:** Alex
+Para todo lo que puede recibir daño:
 
 ```csharp
-public interface IDamageable
+interface IDamageable
 {
-    bool TakeDamage(int damage, Vector2 knockbackDirection, float knockbackForce);
+    bool TakeDamage(int damage, Vector2 knockback, float force);
     int GetCurrentHealth();
     int GetMaxHealth();
     bool IsAlive();
@@ -535,125 +372,54 @@ public interface IDamageable
 }
 ```
 
-**Implementado por:**
-- PlayerController
-- BaseEnemy (y todas sus subclases)
-- Boss
+**Quién lo implementa:**
+- Player
+- Enemigos
+- Bosses
 - Objetos destructibles
-
-**Ventaja:** Cualquier cosa que pueda recibir daño implementa la misma interfaz, permitiendo código genérico.
 
 ### IEnemy
 
-**Propósito:** Contrato para comportamiento de enemigos  
-**Desarrollador:** Alex
+Para enemigos:
 
 ```csharp
-public interface IEnemy : IDamageable
+interface IEnemy : IDamageable
 {
     char GetEnemyType();
     bool CanSeePlayer();
     void AttackPlayer();
-    bool IsAttacking();
 }
 ```
 
-**Implementado por:**
-- PatrolEnemy
-- ChaseEnemy
-- FlyingEnemy (futuro)
-- Otros tipos de enemigos
-
 ### IBoss
 
-**Propósito:** Contrato para comportamiento de bosses  
-**Desarrollador:** Alex
+Para bosses:
 
 ```csharp
-public interface IBoss : IDamageable
+interface IBoss : IDamageable
 {
     string GetBossId();
     void EnterBattle();
-    void ExitBattle();
     int GetCurrentPhase();
 }
 ```
 
-**Implementado por:**
-- Boss
-- FinalBoss
-- Bosses futuros
+**Por qué interfaces:**
+- El código puede trabajar con "cualquier IDamageable" sin importar si es player o enemigo
+- Más flexible
+- C# no tiene herencia múltiple de todas formas
 
 ---
 
-## Sistema de Eventos
-
-### Ventajas del Sistema de Eventos
-
-1. **Desacoplamiento Total**
-   - Sistemas no se conocen entre sí
-   - Fácil agregar/remover listeners
-   - Código más testeable
-
-2. **Flexibilidad**
-   - Múltiples listeners para un evento
-   - Agregar nuevos eventos sin modificar código existente
-
-3. **Debugging**
-   - Todos los eventos logeados en Console (si debug enabled)
-   - Fácil tracking de flujo de datos
-
-### Ejemplo de Uso Completo
-
-```csharp
-// Definir evento (en GameEvents.cs)
-public struct BossDefeatedEvent
-{
-    public string bossId;
-    public int levelNumber;
-    public float timeTaken;
-}
-
-// Suscribirse (en GameManager.Start())
-EventManager.Subscribe<BossDefeatedEvent>(OnBossDefeated);
-
-// Broadcast (en Boss.Die())
-EventManager.Broadcast(new BossDefeatedEvent
-{
-    bossId = "boss1",
-    levelNumber = 3,
-    timeTaken = 245.5f
-});
-
-// Handler (en GameManager)
-private void OnBossDefeated(BossDefeatedEvent eventData)
-{
-    Debug.Log($"Boss {eventData.bossId} defeated in {eventData.timeTaken}s");
-    saveData.defeatedBosses[eventData.bossId] = true;
-    SaveGameState();
-    // Desbloquear siguiente nivel
-    ProgressToNextLevel();
-}
-
-// Desuscribirse (en GameManager.OnDestroy())
-EventManager.Unsubscribe<BossDefeatedEvent>(OnBossDefeated);
-```
-
----
-
-## Persistencia de Datos
+## El Sistema de Guardado
 
 ### GameSaveData
-
-**Desarrollador:** Russel  
-**Formato:** JSON  
-**Ubicación:** `Application.persistentDataPath/gamesave.json`
 
 ```csharp
 [Serializable]
 public class GameSaveData
 {
-    // Progresión
+    // Progreso
     public int currentLevel = 1;
     public List<int> completedLevels = new List<int>();
     
@@ -663,10 +429,9 @@ public class GameSaveData
     // Bosses
     public Dictionary<string, bool> defeatedBosses = new Dictionary<string, bool>();
     
-    // Stats del jugador
+    // Stats
     public int maxHealth = 100;
     public int currentHealth = 100;
-    public int weaponDamage = 10;
     
     // Habilidades
     public List<string> specialAbilities = new List<string>();
@@ -674,179 +439,185 @@ public class GameSaveData
     // Metadata
     public float playTime = 0f;
     public DateTime lastSaveTime;
-    public string version = "1.0";
 }
 ```
 
-### Sistema de Guardado Automático
+**Dónde se guarda:**
+- Application.persistentDataPath + "/gamesave.json"
+- En Windows: C:/Users/[usuario]/AppData/LocalLow/[company]/[juego]/
+- Es JSON así que puedes editarlo si quieres (para testing)
 
-**Triggers de guardado automático:**
-- Completar nivel
-- Derrotar boss
-- Tomar decisión BUENO/MALO
-- Recoger upgrade
-- Cada 5 minutos (autosave periódico)
+**Cuándo se guarda:**
+- Al completar nivel
+- Al derrotar boss
+- Cada 5 minutos (autosave)
+- Al salir del juego
 
-**Proceso:**
-```
-1. EventManager broadcast evento significativo
-2. GameManager escucha y actualiza saveData en memoria
-3. GameManager.SaveGameState() llamado
-4. Serialización a JSON con JsonUtility
-5. Escritura a disco con respaldo del archivo anterior
-6. Broadcast GameSavedEvent
-```
+**Problemas que tuvimos:**
+- Versión 1 de Russel borraba todo a veces
+- Versión 2 guardaba en lugares random
+- Versión final funciona bien
 
 ---
 
 ## Organización del Código
 
-### Estructura de Carpetas
+### Estructura de carpetas
 
 ```
-Assets/Scripts/
+Scripts/
+├── Core/
+│   ├── GameManager.cs
+│   ├── EventManager.cs
+│   └── GameEvents.cs
 │
-├── Core/                      # Sistemas fundamentales
-│   ├── GameManager.cs         # Estado global (Alex)
-│   ├── EventManager.cs        # Pub/Sub (Alex)
-│   └── GameEvents.cs          # Definiciones de eventos (Alex)
+├── Data/
+│   └── GameSaveData.cs
 │
-├── Data/                      # Estructuras de datos
-│   └── GameSaveData.cs        # Persistencia (Russel)
-│
-├── Utilities/                 # Código reutilizable
-│   ├── Interfaces/
-│   │   ├── IDamageable.cs     # (Alex)
-│   │   ├── IEnemy.cs          # (Alex)
-│   │   └── IBoss.cs           # (Alex)
-│   │
-│   └── Events/
-│       ├── GameEvents.cs      # Structs de eventos
-│       └── EventManager.cs    # Manager Pub/Sub
-│
-├── Entities/                  # Entidades del juego
+├── Entities/
 │   ├── Player/
-│   │   └── PlayerController.cs  # (Alex)
+│   │   └── PlayerController.cs
 │   │
 │   ├── Enemy/
 │   │   ├── Base/
-│   │   │   └── BaseEnemy.cs     # (Saul)
-│   │   │
+│   │   │   └── BaseEnemy.cs
 │   │   └── Types/
-│   │       ├── PatrolEnemy.cs   # (Saul)
-│   │       └── ChaseEnemy.cs    # (Saul)
+│   │       ├── PatrolEnemy.cs
+│   │       └── ChaseEnemy.cs
 │   │
 │   └── Boss/
-│       ├── Boss.cs               # (Saul)
-│       └── FinalBoss.cs          # (Saul)
+│       ├── Boss.cs
+│       └── FinalBoss.cs
 │
-├── Managers/                  # Gestores de sistemas
-│   ├── CameraManager.cs       # (Alex)
-│   ├── BackgroundManager.cs   # (Saul)
-│   └── LevelManager.cs        # (Russel)
+├── Managers/
+│   ├── CameraManager.cs
+│   ├── BackgroundManager.cs
+│   └── LevelManager.cs
 │
-└── Legacy/                    # Scripts antiguos
-    └── (scripts a refactorizar)
+├── Utilities/
+│   └── Interfaces/
+│       ├── IDamageable.cs
+│       ├── IEnemy.cs
+│       └── IBoss.cs
+│
+└── Legacy/
+    └── (cosas viejas que mejor no tocar)
 ```
+
+**Regla simple:**
+- Si es un sistema core → Core/
+- Si guarda datos → Data/
+- Si es una entidad del juego → Entities/
+- Si maneja algo → Managers/
+- Si es genérico → Utilities/
+- Si da miedo → Legacy/
 
 ---
 
-## Decisiones Arquitectónicas
+## Por qué hicimos lo que hicimos
 
-### Por Qué Singleton para GameManager
+### ¿Por qué Singleton para GameManager?
 
-**Razones:**
-- ✅ Necesitamos exactamente una instancia
-- ✅ Acceso global desde cualquier script
-- ✅ Persiste entre escenas (DontDestroyOnLoad)
-- ✅ Patrón común en Unity para managers
+**Pros:**
+- ✅ Fácil de acceder desde cualquier lado
+- ✅ Persiste entre escenas
+- ✅ Todos los tutoriales lo usan
+- ✅ Simple de implementar
 
-**Alternativas consideradas:**
-- Static class → ❌ No es MonoBehaviour, pierde features de Unity
-- ScriptableObject → ❌ No persiste estado en runtime correctamente
-- DI Container → ❌ Over-engineering para scope del proyecto
+**Cons:**
+- ❌ Es técnicamente un anti-pattern
+- ❌ Puede crecer demasiado
+- ❌ Dificulta testing unitario
 
-### Por Qué Pub/Sub en vez de Referencias Directas
+**Veredicto:** Para un game jam está bien. Para un proyecto grande, quizá usaríamos otra cosa.
 
-**Razones:**
-- ✅ Elimina acoplamiento entre sistemas
-- ✅ Fácil agregar nuevos listeners sin modificar código
-- ✅ Permite testing independiente de componentes
-- ✅ Reduce dependencias circulares
+### ¿Por qué eventos en vez de referencias directas?
 
 **Antes:**
 ```csharp
-// Acoplamiento fuerte
+// Acoplamiento fuerte (malo)
 FindObjectOfType<HUDManager>().UpdateScore(10);
 FindObjectOfType<LevelManager>().CheckEnemiesDefeated();
 ```
 
 **Después:**
 ```csharp
-// Desacoplado
+// Desacoplado (bueno)
 EventManager.Broadcast(new EnemyDefeatedEvent { enemyType = 'X' });
-// HUDManager y LevelManager escuchan independientemente
+// Quien quiera escuchar, escucha
 ```
 
-### Por Qué Interfaces en vez de Herencia Múltiple
+**Por qué es mejor:**
+- No hay dependencias directas
+- Fácil agregar/remover listeners
+- Más fácil de debuggear
+- Más rápido (no hay FindObjectOfType)
+
+### ¿Por qué JSON y no binario?
 
 **Razones:**
-- ✅ C# no soporta herencia múltiple
-- ✅ Interfaces permiten contratos sin implementación forzada
-- ✅ Composición sobre herencia (principio SOLID)
-- ✅ Código más flexible y testeable
+- ✅ Puedes leer el archivo de guardado
+- ✅ Fácil de debuggear
+- ✅ Puedes editarlo manualmente para testing
+- ✅ Simple de implementar
 
-### Por Qué JSON en vez de Binary
-
-**Razones:**
-- ✅ Legible por humanos (debugging fácil)
-- ✅ Fácil editar manualmente para testing
-- ✅ Versionable en Git
-- ✅ Fácil migración entre versiones del juego
-
-**Desventaja aceptada:**
-- ❌ Menos seguro (se puede editar) → Aceptable para Game Jam
+**Desventajas:**
+- ❌ Más grande que binario
+- ❌ El jugador puede hacer trampa (no nos importó)
 
 ---
 
-## Métricas de Calidad
+## Métricas (porque sí)
 
-### Complejidad Ciclomática
-- GameManager: ~12 (Moderada)
-- EventManager: ~5 (Baja)
-- PlayerController: ~18 (Moderada-Alta, aceptable para controller)
-- BaseEnemy: ~10 (Moderada)
+### Complejidad
+- GameManager: Moderada (tiene bastantes métodos)
+- EventManager: Baja (es simple)
+- PlayerController: Media-Alta (tiene muchos estados)
+- BaseEnemy: Media (maneja varias cosas)
 
 ### Acoplamiento
-- **Antes de refactorización:** Alto (~30+ FindWithTag calls)
-- **Después:** Muy bajo (0 FindWithTag, todo por eventos)
+- **Antes:** Alto (FindObjectOfType por todos lados)
+- **Después:** Bajo (eventos para todo)
 
-### Cohesión
-- **Alta:** Cada clase tiene una responsabilidad clara y única
-
-### Cobertura de Documentación
-- **100%:** Todos los sistemas principales documentados
-- **README:** 437 líneas
-- **Docs adicionales:** 15+ archivos
+### Bugs encontrados
+- **Semana 1:** 15+
+- **Semana 2:** 20+
+- **Semana 3:** 10+
+- **Al entregar:** 2 (conocidos)
 
 ---
 
 ## Conclusión
 
-La arquitectura de Game Jam Fantasma demuestra que es posible construir un juego profesional y escalable en solo 3 semanas siguiendo principios sólidos de ingeniería de software:
+Hicimos un juego funcional en 3 semanas. La arquitectura no es perfecta pero:
 
-✅ **Patrones de diseño** aplicados correctamente  
-✅ **Separación de responsabilidades** clara  
-✅ **Código desacoplado** mediante eventos  
-✅ **Abstracciones** que facilitan extensión  
-✅ **Persistencia** robusta y confiable  
-✅ **Organización** que facilita navegación  
+✅ Funciona  
+✅ Es mantenible  
+✅ Pudimos agregar features fácilmente  
+✅ No es un desastre de código  
+✅ Aprendimos mucho
 
-Esta arquitectura no solo permitió desarrollo rápido durante el Game Jam, sino que también sienta las bases para futuro desarrollo y mantenimiento del proyecto.
+Para un game jam amateur, está bastante bien.
 
 ---
 
-**Documento preparado por:** Alex (Lead Developer)  
-**Revisado por:** Saul (Senior Developer)  
-**Fecha:** Noviembre 9, 2025  
-**Versión:** 1.0
+## Cosas que haríamos diferente
+
+Si lo hiciéramos de nuevo:
+
+1. Usar un sistema de inyección de dependencias (quizá)
+2. Escribir tests (definitivamente)
+3. Planear mejor la arquitectura desde el inicio
+4. No hacer commits a las 4 AM
+5. Hacer más code reviews
+6. Documentar mientras programamos, no después
+
+Pero hey, para ser nuestro primer game jam serio, no está mal.
+
+---
+
+**Documento escrito por:** Alex (con ayuda del equipo)  
+**Cuando:** Después de entregar (entre el cansancio)  
+**Versión:** 1.0 (aka "la única")
+
+*"Si compilas en la primera, algo está mal"* - Ley de Murphy del desarrollo
